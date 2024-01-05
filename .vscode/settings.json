@@ -1,0 +1,5 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "cSpell.ignoreWords": ["Listat", "Uusi", "lato", "lista"],
+  "cSpell.words": ["Halutko", "Lisää", "listalle", "listan", "Muokkaa", "nimeä", "nimi", "Parag", "poistaa", "typeguard"]
+}
