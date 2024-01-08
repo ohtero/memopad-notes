@@ -11,6 +11,7 @@ import { Button, MenuButton } from '../components/UI/Button';
 import { ChevronDownIcon, ChevronUpIcon, EditIcon } from '../assets/Icons';
 import { Modal } from '../components/UI/Modal';
 import { Paragraph } from '../components/UI/Paragraph';
+import { Device } from '../assets/breakpoints';
 
 export function SelectedList() {
   const [listName, setListName] = useState<string>('');
@@ -65,10 +66,7 @@ export function SelectedList() {
       body: JSON.stringify(mergedItemsData),
     };
     try {
-      const res = await fetch('http://localhost:4000/lists/addListItem', options);
-      if (res.ok) {
-        console.log(res);
-      }
+      await fetch('http://localhost:4000/lists/addListItem', options);
     } catch (err) {
       console.log('Failed to save item to database', err);
     }
@@ -177,12 +175,17 @@ export function SelectedList() {
 
 const TopWrapper = styled.div`
   box-shadow: ${(props) => props.theme.shadows.bottomSmall};
+  background: ${(props) => props.theme.colors.menuBackground};
+  padding: 0.5rem 0;
+  @media (max-width: ${Device.sm}) {
+    font-size: clamp(0.8rem, 4vw, 1rem);
+    padding: clamp(0.1rem, 2vw, 0.5rem) 0;
+  }
 `;
 const Header = styled.header`
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  background: ${(props) => props.theme.colors.menuBackground};
+  padding: 0 0.7rem;
 `;
 
 const ListNameWrapper = styled.div`
@@ -193,7 +196,6 @@ const ListNameWrapper = styled.div`
 `;
 
 const ListName = styled.h3`
-  padding: 0;
   color: ${(props) => props.theme.colors.offWhite};
 `;
 
@@ -217,17 +219,29 @@ const ShowInputButton = styled(Button)`
 
 const InputWrapper = styled.div`
   display: flex;
-  padding: 0.75rem;
+  padding: 0.5rem;
   gap: 0.25rem;
+  height: fit-content;
   background: ${(props) => props.theme.colors.menuBackground};
 `;
 const Input = styled.input`
   flex-basis: 100%;
   border-radius: 5px;
+  font-size: 1rem;
+  padding: 0.5rem;
+  height: fit-content;
+  @media (max-width: ${Device.sm}) {
+    font-size: clamp(0.8rem, 4vw, 1rem);
+    padding: clamp(0.25rem, 2vw, 0.5rem);
+  }
 `;
 const AddButton = styled(Button)`
   padding: 0.5rem 1rem;
   flex-basis: fit-content;
+  @media (max-width: ${Device.sm}) {
+    font-size: clamp(0.8rem, 4vw, 1rem);
+    padding: clamp(0.25rem, 2vw, 0.5rem) 1rem;
+  }
 `;
 const ItemsList = styled(ListSelector)``;
 
