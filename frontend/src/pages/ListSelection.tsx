@@ -118,7 +118,7 @@ export function ListSelection() {
 export const ListSelector = styled.ul`
   display: flex;
   flex-direction: column;
-  padding: 0 0.5rem;
+  padding: 0.5rem;
   margin-top: 0.5rem;
   gap: 0.75rem;
   list-style: none;
@@ -151,7 +151,6 @@ const ListSelectorButton = styled.button`
 const ListDeleteButton = styled(ListSelectorButton)`
   width: fit-content;
   border-radius: 0 5px 5px 0;
-
   &:hover {
     cursor: pointer;
   }
