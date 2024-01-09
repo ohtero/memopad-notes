@@ -58,6 +58,7 @@ const Icon = styled.svg<{ $dark?: boolean; height: string }>`
   stroke: ${(props) => (props.$dark ? props.theme.colors.menuBackground : props.theme.colors.highlight)};
   &:hover {
     cursor: pointer;
+    filter: ${(props) => (props.$dark ? 'drop-shadow(1px 1px 1px #666) brightness(0.8)' : 'drop-shadow(0px 0px 2px #888) brightness(1.5)')};
   }
 `;
 export { ChevronDownIcon, ChevronUpIcon, DeleteIcon, EditIcon };
