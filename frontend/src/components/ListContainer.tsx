@@ -4,10 +4,15 @@ interface ListContainerProps {
   children: React.ReactNode;
 }
 
-export function PageContainer({ children }: ListContainerProps) {
+export function ListContainer({ children }: ListContainerProps) {
   return <Container>{children}</Container>;
 }
 
 const Container = styled.main`
   height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
 `;
