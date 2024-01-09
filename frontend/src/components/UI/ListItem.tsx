@@ -6,14 +6,15 @@ import { Device } from '../../assets/breakpoints';
 type ListItemProps = {
   id: string;
   value: string;
+  completed: boolean;
   handleClick: () => void;
 };
 
-export function ListItem({ id, value, handleClick }: ListItemProps) {
+export function ListItem({ id, value, completed, handleClick }: ListItemProps) {
   const [itemValue, setItemValue] = useState<string>(value);
   const [initItemValue, setInitItemValue] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isCompleted, setIsCompleted] = useState<boolean>(completed);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +24,7 @@ export function ListItem({ id, value, handleClick }: ListItemProps) {
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ list_item_id: id, list_item_value: itemValue }),
+      body: JSON.stringify({ list_item_id: id, list_item_value: itemValue, completed: isCompleted }),
     };
 
     if (initItemValue !== itemValue) {
@@ -37,13 +38,34 @@ export function ListItem({ id, value, handleClick }: ListItemProps) {
     }
   }
 
+  async function syncCompletionState() {
+    // const completed = !isCompleted;
+    const options = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ list_item_id: id, completed: !isCompleted }),
+    };
+    try {
+      const res = await fetch('http://localhost:4000/lists/updateCompletionState', options);
+      if (res.status === 500) {
+        console.error('Internal server error');
+      }
+    } catch (err) {
+      console.error('Could not update completion state: ', err);
+    }
+  }
+
   return (
     <ItemContainer $completed={isCompleted}>
       <TextContainer>
         <Overlay
           disabled={isDisabled}
           onDoubleClick={() => {
-            isDisabled && setIsCompleted((prevState) => !prevState), inputRef.current?.blur();
+            setIsCompleted((prevState) => !prevState);
+            void syncCompletionState();
+            inputRef.current?.blur();
           }}
         />
         <ItemText

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { fetchData } from '../utils/fetchData';
 import { useListContext } from '../context/listContext';
-import { ListData, ListItems } from '../types';
+import { ListData, ListItemType } from '../types';
 import { ListItem } from '../components/UI/ListItem';
 import { isListValues, isString } from '../utils/typeGuard';
 import { ListSelector } from './ListSelection';
@@ -16,21 +16,59 @@ import { Device } from '../assets/breakpoints';
 export function SelectedList() {
   const [listName, setListName] = useState<string>('');
   const [editableListName, setEditableListName] = useState<string>('');
-  const [items, setItems] = useState<ListItems[]>([]);
+  const [items, setItems] = useState<ListItemType[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [showInput, setShowInput] = useState<boolean>(false);
 
-  // ? Observe the need for useMemo  with these in the future
   const { id } = useParams();
   const { listData } = useListContext();
 
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ listId: id }),
+    };
+
+    async function getListItems() {
+      try {
+        const data = await fetchData<ListItemType[] | undefined>('http://localhost:4000/lists/singleList', options);
+        if (data !== undefined && isListValues(data)) {
+          setItems([...items, ...data]);
+        }
+      } catch (err) {
+        console.error('failed to fetch list data', err);
+      }
+    }
+    void getListItems();
+    const selectedListName = getListName(id, listData as ListData[]);
+    selectedListName && setListName(selectedListName);
+  }, []);
 
   function getListName(listId: string | undefined, lists: ListData[]) {
     if (isString(listId)) {
       const selectedList = lists.filter((list) => list.list_id === parseInt(listId));
       return selectedList[0].list_name;
     }
+  }
+
+  function createListComponents() {
+    const components: React.ReactNode[] = items.map(({ list_item_id, list_item_value, completed }) => {
+      return (
+        <ListItem
+          key={list_item_id}
+          id={list_item_id}
+          value={list_item_value}
+          completed={completed}
+          handleClick={() => void deleteListItem(list_item_id)}
+        />
+      );
+    });
+    return components;
   }
 
   function toggleInputVisibility(state: boolean) {
@@ -42,21 +80,16 @@ export function SelectedList() {
   }
 
   function createListItem() {
-    if (inputValue.length > 0) {
+    if (inputValue.trim().length > 0) {
       const id: string = crypto.randomUUID();
-      const newItem: ListItems = { list_item_id: id, list_item_value: inputValue };
+      const newItem: ListItemType = { list_item_id: id, list_item_value: inputValue, completed: false };
       setItems([...items, newItem]);
       void postListItem(newItem);
     }
-  }
-  function createComponents() {
-    const components: React.ReactNode[] = items.map(({ list_item_id, list_item_value }) => {
-      return <ListItem key={list_item_id} id={list_item_id} value={list_item_value} handleClick={() => void deleteListItem(list_item_id)} />;
-    });
-    return components;
+    setInputValue('');
   }
 
-  async function postListItem(items: ListItems) {
+  async function postListItem(items: ListItemType) {
     const mergedItemsData = { ...items, ...{ list_id: id } };
     const options = {
       method: 'POST',
@@ -106,30 +139,6 @@ export function SelectedList() {
     }
   }
 
-  useEffect(() => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ listId: id }),
-    };
-
-    async function getListItems() {
-      try {
-        const data = await fetchData<ListItems[] | undefined>('http://localhost:4000/lists/singleList', options);
-        if (data !== undefined && isListValues(data)) {
-          setItems([...items, ...data]);
-        }
-      } catch (err) {
-        console.error('failed to fetch list data', err);
-      }
-    }
-    void getListItems();
-    const selectedListName = getListName(id, listData as ListData[]);
-    selectedListName && setListName(selectedListName);
-  }, []);
-
   return (
     <>
       <TopWrapper>
@@ -149,12 +158,18 @@ export function SelectedList() {
         </Header>
         {showInput && (
           <InputWrapper>
-            <Input type="text" placeholder="Lisää listaan..." value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+            <Input
+              type="text"
+              placeholder="Lisää listaan..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && createListItem()}
+            />
             <AddButton onClick={() => createListItem()}>lisää</AddButton>
           </InputWrapper>
         )}
       </TopWrapper>
-      <ItemsList>{createComponents()}</ItemsList>
+      <ItemsList>{createListComponents()}</ItemsList>
       <Modal ref={dialogRef}>
         <Paragraph $bold>Muokkaa nimeä</Paragraph>
         <ListNameInput value={editableListName} onChange={(e) => setEditableListName(e.target.value)} />
