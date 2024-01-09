@@ -20,11 +20,11 @@ async function getAllLists(req: Request, res: Response) {
   }
 }
 
-async function getSingleList(req: Request, res: Response) {
+async function getSingleListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const { listId } = req.body;
   try {
-    const listData = await client.query(`SELECT list_item_id, list_item_value FROM list_items WHERE list_id = ${listId}`);
+    const listData = await client.query(`SELECT list_item_id, list_item_value, completed FROM list_items WHERE list_id = ${listId}`);
     res.json(listData.rows);
   } catch (err) {
     console.log('Could not send list information', err);
@@ -60,12 +60,13 @@ async function deleteList(req: Request, res: Response) {
 
 async function addListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_id, list_item_id, list_item_value } = req.body;
+  const { list_id, list_item_id, list_item_value, completed } = req.body;
   try {
-    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value) VALUES ($1, $2, $3)', [
+    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4)', [
       list_id,
       list_item_id,
       list_item_value,
+      completed,
     ]);
     res.json('List saved').status(200);
   } catch (err) {
@@ -101,6 +102,20 @@ async function updateListItem(req: Request, res: Response) {
   }
 }
 
+async function updateCompletionState(req: Request, res: Response) {
+  const client = req.dbClient as PoolClient;
+  const { list_item_id, completed } = req.body;
+  try {
+    await client.query('UPDATE list_items SET completed = ($2) WHERE list_item_id = ($1)', [list_item_id, completed]);
+    res.send().status(200);
+  } catch (err) {
+    console.log('Error updating list completion state: ', err);
+    res.send().status(500);
+  } finally {
+    client.release();
+  }
+}
+
 async function updateListName(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const { list_id, list_name } = req.body;
@@ -109,9 +124,20 @@ async function updateListName(req: Request, res: Response) {
     res.send().status(200);
   } catch (err) {
     console.error('Error updating list item', err);
+    res.send().status(500);
   } finally {
     client.release();
   }
 }
 
-export { getAllLists, getSingleList, createNewList, deleteList, addListItem, deleteListItem, updateListItem, updateListName };
+export {
+  getAllLists,
+  getSingleListItem,
+  createNewList,
+  deleteList,
+  addListItem,
+  deleteListItem,
+  updateListItem,
+  updateCompletionState,
+  updateListName,
+};
