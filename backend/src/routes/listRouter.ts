@@ -5,7 +5,7 @@ import {
   deleteList,
   deleteListItem,
   getAllLists,
-  getSingleListItem,
+  getSingleList,
   updateCompletionState,
   updateListItem,
   updateListName,
@@ -13,14 +13,14 @@ import {
 
 const listRouter = express.Router();
 
-listRouter.get('/getAllLists', getAllLists);
-listRouter.post('/singleList', getSingleListItem);
-listRouter.post('/newList', createNewList);
-listRouter.post('/deleteList', deleteList);
-listRouter.post('/addListItem', addListItem);
-listRouter.post('/deleteListItem', deleteListItem);
-listRouter.post('/updateListItem', updateListItem);
-listRouter.post('/updateListName', updateListName);
-listRouter.post('/updateCompletionState', updateCompletionState);
+listRouter.get('/', getAllLists);
+listRouter.post('/', createNewList);
+listRouter.get('/:list', getSingleList);
+listRouter.delete('/:list', deleteList);
+listRouter.patch('/:list', updateListName);
+listRouter.post('/:list', addListItem);
+listRouter.delete('/:list/:item', deleteListItem);
+listRouter.patch('/:list/:item', updateListItem);
+listRouter.patch('/:list/:item/:completion', updateCompletionState);
 
 export { listRouter };

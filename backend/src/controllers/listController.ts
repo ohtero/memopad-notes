@@ -20,11 +20,11 @@ async function getAllLists(req: Request, res: Response) {
   }
 }
 
-async function getSingleListItem(req: Request, res: Response) {
+async function getSingleList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { listId } = req.body;
+  const list_id = req.params.list;
   try {
-    const listData = await client.query(`SELECT list_item_id, list_item_value, completed FROM list_items WHERE list_id = ${listId}`);
+    const listData = await client.query(`SELECT list_item_id, list_item_value, completed FROM list_items WHERE list_id = ${list_id}`);
     res.json(listData.rows);
   } catch (err) {
     console.log('Could not send list information', err);
@@ -47,9 +47,9 @@ async function createNewList(req: Request, res: Response) {
 
 async function deleteList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { listId } = req.body;
+  const list_id = req.params.list;
   try {
-    const listData = await client.query(`DELETE FROM lists WHERE (list_id) = ${listId} RETURNING *`);
+    const listData = await client.query(`DELETE FROM lists WHERE (list_id) = ${list_id} RETURNING *`);
     res.json(listData.rows).status(200);
   } catch (err) {
     console.error('Error when deleting list', err);
@@ -60,7 +60,8 @@ async function deleteList(req: Request, res: Response) {
 
 async function addListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_id, list_item_id, list_item_value, completed } = req.body;
+  const { list_item_id, list_item_value, completed } = req.body;
+  const list_id = req.params.list;
   try {
     await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4)', [
       list_id,
@@ -78,7 +79,7 @@ async function addListItem(req: Request, res: Response) {
 
 async function deleteListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_item_id } = req.body;
+  const list_item_id = req.params.item;
   try {
     await client.query('DELETE FROM list_items WHERE (list_item_id) = ($1)', [list_item_id]);
     res.send().status(200);
@@ -91,7 +92,8 @@ async function deleteListItem(req: Request, res: Response) {
 
 async function updateListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_item_id, list_item_value } = req.body;
+  const { list_item_value } = req.body;
+  const list_item_id = req.params.item;
   try {
     await client.query('UPDATE list_items SET list_item_value = ($2) WHERE (list_item_id) = ($1)', [list_item_id, list_item_value]);
     res.send().status(200);
@@ -104,7 +106,9 @@ async function updateListItem(req: Request, res: Response) {
 
 async function updateCompletionState(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_item_id, completed } = req.body;
+  const list_item_id = req.params.item;
+  const completed = req.params.completion;
+
   try {
     await client.query('UPDATE list_items SET completed = ($2) WHERE list_item_id = ($1)', [list_item_id, completed]);
     res.send().status(200);
@@ -118,7 +122,8 @@ async function updateCompletionState(req: Request, res: Response) {
 
 async function updateListName(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_id, list_name } = req.body;
+  const { list_name } = req.body;
+  const list_id = req.params.list;
   try {
     await client.query('UPDATE lists SET list_name = ($2) WHERE (list_id) = ($1)', [list_id, list_name]);
     res.send().status(200);
@@ -130,14 +135,4 @@ async function updateListName(req: Request, res: Response) {
   }
 }
 
-export {
-  getAllLists,
-  getSingleListItem,
-  createNewList,
-  deleteList,
-  addListItem,
-  deleteListItem,
-  updateListItem,
-  updateCompletionState,
-  updateListName,
-};
+export { getAllLists, getSingleList, createNewList, deleteList, addListItem, deleteListItem, updateListItem, updateCompletionState, updateListName };
