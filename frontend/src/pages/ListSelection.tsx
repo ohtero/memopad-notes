@@ -16,8 +16,8 @@ export type FocusedList = {
 };
 
 export function ListSelection() {
-  const [listComponents, setListComponents] = useState<React.ReactNode[]>([]);
   const { listData, updateListData } = useListContext();
+  const [listComponents, setListComponents] = useState<React.ReactNode[]>([]);
   const [focusedList, setFocusedList] = useState<FocusedList>({ listName: '', listId: 0 });
 
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -33,14 +33,13 @@ export function ListSelection() {
 
   async function deleteTargetList(id: number) {
     const options = {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ listId: id }),
     };
     try {
-      const data = await fetchData<ListData[]>('http://localhost:4000/lists/deleteList', options);
+      const data = await fetchData<ListData[]>(`http://localhost:4000/lists/${id}`, options);
       if (data !== undefined && isList(data)) {
         const newList = listData.filter((list: ListData) => list.list_id !== id);
         updateListData(newList);
@@ -76,7 +75,7 @@ export function ListSelection() {
   useEffect(() => {
     async function getLists() {
       try {
-        const data = await fetchData<ListData[] | string>('http://localhost:4000/lists/getAllLists');
+        const data = await fetchData<ListData[] | string>('http://localhost:4000/lists');
         if (data !== undefined && isList(data)) {
           updateListData(data);
         }

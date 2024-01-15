@@ -16,7 +16,7 @@ export function OptionMenu() {
     };
 
     try {
-      const data = await fetchData<ListData[]>('http://localhost:4000/lists/newList', options);
+      const data = await fetchData<ListData[]>('http://localhost:4000/lists', options);
       if (data !== undefined && isList(data)) {
         const id = data[0].list_id;
         addListData(data);

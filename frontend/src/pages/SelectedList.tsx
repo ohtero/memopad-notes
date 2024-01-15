@@ -27,16 +27,15 @@ export function SelectedList() {
 
   useEffect(() => {
     const options = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ listId: id }),
     };
 
     async function getListItems() {
       try {
-        const data = await fetchData<ListItemType[] | undefined>('http://localhost:4000/lists/singleList', options);
+        const data = await fetchData<ListItemType[] | undefined>(`http://localhost:4000/lists/${id}`, options);
         if (data !== undefined && isListValues(data)) {
           setItems([...items, ...data]);
         }
@@ -61,7 +60,8 @@ export function SelectedList() {
       return (
         <ListItem
           key={list_item_id}
-          id={list_item_id}
+          listId={id as string}
+          itemId={list_item_id}
           value={list_item_value}
           completed={completed}
           handleClick={() => void deleteListItem(list_item_id)}
@@ -72,66 +72,60 @@ export function SelectedList() {
   }
 
   function toggleInputVisibility(state: boolean) {
-    if (!state) {
-      setShowInput(true);
-    } else {
-      setShowInput(false);
-    }
+    !state ? setShowInput(true) : setShowInput(false);
   }
 
   function createListItem() {
     if (inputValue.trim().length > 0) {
-      const id: string = crypto.randomUUID();
-      const newItem: ListItemType = { list_item_id: id, list_item_value: inputValue, completed: false };
+      const itemId: string = crypto.randomUUID();
+      const newItem: ListItemType = { list_item_id: itemId, list_item_value: inputValue, completed: false };
       setItems([...items, newItem]);
       void postListItem(newItem);
     }
     setInputValue('');
   }
 
-  async function postListItem(items: ListItemType) {
-    const mergedItemsData = { ...items, ...{ list_id: id } };
+  async function postListItem(newItem: ListItemType) {
     const options = {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify(mergedItemsData),
+      body: JSON.stringify(newItem),
     };
     try {
-      await fetch('http://localhost:4000/lists/addListItem', options);
+      await fetch(`http://localhost:4000/lists/${id}`, options);
     } catch (err) {
       console.log('Failed to save item to database', err);
     }
   }
 
-  async function deleteListItem(id: string) {
-    const filteredItems = items.filter((item) => item.list_item_id !== id);
+  async function deleteListItem(itemId: string) {
+    const filteredItems = items.filter((item) => item.list_item_id !== itemId);
     setItems(filteredItems);
     try {
       const options = {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ list_item_id: id }),
       };
-      await fetch('http://localhost:4000/lists//deleteListItem', options);
+      await fetch(`http://localhost:4000/lists/${id}/${itemId}`, options);
     } catch (err) {
       console.error('Could not delete list item'), err;
     }
   }
 
-  async function updateListName(name: string, oldName: string, id: string) {
+  async function updateListName(name: string, oldName: string) {
     const options = {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ list_name: name, list_id: id }),
+      body: JSON.stringify({ list_name: name }),
     };
     try {
-      const res = await fetch('http://localhost:4000/lists/updateListName', options);
+      const res = await fetch(`http://localhost:4000/lists/${id}`, options);
       res.ok && console.log('updated');
     } catch (err) {
       console.error('Could not update list name', err);
@@ -175,7 +169,7 @@ export function SelectedList() {
         <ListNameInput value={editableListName} onChange={(e) => setEditableListName(e.target.value)} />
         <MenuButton
           handleClick={() => {
-            void updateListName(editableListName, listName, id as string);
+            void updateListName(editableListName, listName);
             setListName(editableListName);
             dialogRef.current?.close();
           }}

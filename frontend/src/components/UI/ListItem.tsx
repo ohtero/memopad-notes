@@ -4,13 +4,14 @@ import { DeleteIcon, EditIcon } from '../../assets/Icons';
 import { Device } from '../../assets/breakpoints';
 
 type ListItemProps = {
-  id: string;
+  listId: string;
+  itemId: string;
   value: string;
   completed: boolean;
   handleClick: () => void;
 };
 
-export function ListItem({ id, value, completed, handleClick }: ListItemProps) {
+export function ListItem({ listId, itemId, value, completed, handleClick }: ListItemProps) {
   const [itemValue, setItemValue] = useState<string>(value);
   const [initItemValue, setInitItemValue] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
@@ -20,16 +21,16 @@ export function ListItem({ id, value, completed, handleClick }: ListItemProps) {
 
   async function updateItem() {
     const options = {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ list_item_id: id, list_item_value: itemValue, completed: isCompleted }),
+      body: JSON.stringify({ list_item_value: itemValue }),
     };
 
     if (initItemValue !== itemValue) {
       try {
-        await fetch('http://localhost:4000/lists/updateListItem', options);
+        await fetch(`http://localhost:4000/lists/${listId}/${itemId}`, options);
       } catch (err) {
         console.error('Could not update list item', err);
       } finally {
@@ -39,16 +40,14 @@ export function ListItem({ id, value, completed, handleClick }: ListItemProps) {
   }
 
   async function syncCompletionState() {
-    // const completed = !isCompleted;
     const options = {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ list_item_id: id, completed: !isCompleted }),
     };
     try {
-      const res = await fetch('http://localhost:4000/lists/updateCompletionState', options);
+      const res = await fetch(`http://localhost:4000/lists/${listId}/${itemId}/${!isCompleted}`, options);
       if (res.status === 500) {
         console.error('Internal server error');
       }
