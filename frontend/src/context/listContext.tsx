@@ -8,6 +8,7 @@ export const ListContext = createContext<ListContextProps>({
   addListData: () => {},
 });
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useListContext = () => useContext(ListContext);
 
 export function ListProvider({ children }: PropsWithChildren) {
