@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
 import dotenv from 'dotenv';
-import { listRouter } from './src/routes/listRouter';
-import { connectToDb } from './src/middleware/connectToDb';
+import { listRouter } from './routes/listRouter';
+import { connectToDb } from './middleware/connectToDb';
 
 const app = express();
 
