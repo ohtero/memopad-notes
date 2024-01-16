@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { MenuButton } from './UI/Button';
 import { useNavigate } from 'react-router-dom';
 import { fetchData } from '../utils/fetchData';
-import { ListData } from '../types';
+import { ListData } from '../typings/types';
 import { isList } from '../utils/typeGuard';
 import { useListContext } from '../context/listContext';
 
