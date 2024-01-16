@@ -5,7 +5,7 @@
   "main": "./dist/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon",
+    "dev": "nodemon --watch src --ext ts --exec ts-node ./src/index.ts",
     "prettier": "prettier --write ./"
   },
   "author": "ohtero",
