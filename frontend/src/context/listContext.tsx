@@ -1,5 +1,5 @@
 import { PropsWithChildren, createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { ListData } from '../types';
+import { ListData } from '../typings/types';
 import { ListContextProps } from './contextTypes';
 
 export const ListContext = createContext<ListContextProps>({
