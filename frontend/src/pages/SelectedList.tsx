@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { fetchData } from '../utils/fetchData';
 import { useListContext } from '../context/listContext';
-import { ListData, ListItemType } from '../typings/types';
-import { ListItem } from '../components/ListItem';
+import { ListData, ListItem } from '../typings/types';
+import { Item } from '../components/ListItem';
 import { isListValues, isString } from '../utils/typeGuard';
 import { ListSelector } from './ListSelection';
 import { Button, MenuButton } from '../components/UI/Button';
@@ -18,7 +18,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 export function SelectedList() {
   const [listName, setListName] = useState<string>('');
   const [editableListName, setEditableListName] = useState<string>('');
-  const [items, setItems] = useState<ListItemType[]>([]);
+  const [items, setItems] = useState<ListItem[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [showInput, setShowInput] = useState<boolean>(false);
 
@@ -37,7 +37,7 @@ export function SelectedList() {
 
     async function getListItems() {
       try {
-        const data = await fetchData<ListItemType[] | undefined>(apiUrl + `/lists/${id}`, options);
+        const data = await fetchData<ListItem[] | undefined>(apiUrl + `/lists/${id}`, options);
         if (data !== undefined && isListValues(data)) {
           setItems([...items, ...data]);
         }
@@ -61,7 +61,7 @@ export function SelectedList() {
   function createListComponents() {
     const components: React.ReactNode[] = items.map(({ list_item_id, list_item_value, completed }) => {
       return (
-        <ListItem
+        <Item
           key={list_item_id}
           listId={id as string}
           itemId={list_item_id}
@@ -81,14 +81,14 @@ export function SelectedList() {
   function createListItem() {
     if (inputValue.trim().length > 0) {
       const itemId: string = crypto.randomUUID();
-      const newItem: ListItemType = { list_item_id: itemId, list_item_value: inputValue, completed: false };
+      const newItem: ListItem = { list_item_id: itemId, list_item_value: inputValue, completed: false };
       setItems([...items, newItem]);
       void postListItem(newItem);
     }
     setInputValue('');
   }
 
-  async function postListItem(newItem: ListItemType) {
+  async function postListItem(newItem: ListItem) {
     const options = {
       method: 'POST',
       headers: {
