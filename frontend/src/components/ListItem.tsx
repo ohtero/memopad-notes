@@ -13,7 +13,7 @@ type ListItemProps = {
   handleClick: () => void;
 };
 
-export function ListItem({ listId, itemId, value, completed, handleClick }: ListItemProps) {
+export function Item({ listId, itemId, value, completed, handleClick }: ListItemProps) {
   const [itemValue, setItemValue] = useState<string>(value);
   const [initItemValue, setInitItemValue] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
