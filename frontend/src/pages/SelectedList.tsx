@@ -128,7 +128,7 @@ export function SelectedList() {
       body: JSON.stringify({ list_name: name }),
     };
     try {
-      const res = await fetch(apiUrl + `lists/${id}`, options);
+      const res = await fetch(apiUrl + `/lists/${id}`, options);
       res.ok && console.log('updated');
     } catch (err) {
       console.error('Could not update list name', err);
