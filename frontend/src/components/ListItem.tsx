@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { DeleteIcon, EditIcon } from '../../assets/Icons';
-import { Device } from '../../assets/breakpoints';
+import { DeleteIcon, EditIcon } from '../assets/Icons';
+import { Device } from '../assets/breakpoints';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 type ListItemProps = {
   listId: string;
@@ -30,7 +32,7 @@ export function ListItem({ listId, itemId, value, completed, handleClick }: List
 
     if (initItemValue !== itemValue) {
       try {
-        await fetch(`http://localhost:4000/lists/${listId}/${itemId}`, options);
+        await fetch(apiUrl + `/lists/${listId}/${itemId}`, options);
       } catch (err) {
         console.error('Could not update list item', err);
       } finally {
@@ -47,7 +49,7 @@ export function ListItem({ listId, itemId, value, completed, handleClick }: List
       },
     };
     try {
-      const res = await fetch(`http://localhost:4000/lists/${listId}/${itemId}/${!isCompleted}`, options);
+      const res = await fetch(apiUrl + `/lists/${listId}/${itemId}/${!isCompleted}`, options);
       if (res.status === 500) {
         console.error('Internal server error');
       }
