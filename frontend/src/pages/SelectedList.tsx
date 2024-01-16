@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { fetchData } from '../utils/fetchData';
 import { useListContext } from '../context/listContext';
-import { ListData, ListItemType } from '../types';
-import { ListItem } from '../components/UI/ListItem';
+import { ListData, ListItemType } from '../typings/types';
+import { ListItem } from '../components/ListItem';
 import { isListValues, isString } from '../utils/typeGuard';
 import { ListSelector } from './ListSelection';
 import { Button, MenuButton } from '../components/UI/Button';
@@ -12,6 +12,8 @@ import { ChevronDownIcon, ChevronUpIcon, EditIcon } from '../assets/Icons';
 import { Modal } from '../components/UI/Modal';
 import { Paragraph } from '../components/UI/Paragraph';
 import { Device } from '../assets/breakpoints';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export function SelectedList() {
   const [listName, setListName] = useState<string>('');
@@ -35,7 +37,7 @@ export function SelectedList() {
 
     async function getListItems() {
       try {
-        const data = await fetchData<ListItemType[] | undefined>(`http://localhost:4000/lists/${id}`, options);
+        const data = await fetchData<ListItemType[] | undefined>(apiUrl + `/lists/${id}`, options);
         if (data !== undefined && isListValues(data)) {
           setItems([...items, ...data]);
         }
@@ -46,6 +48,7 @@ export function SelectedList() {
     void getListItems();
     const selectedListName = getListName(id, listData as ListData[]);
     selectedListName && setListName(selectedListName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function getListName(listId: string | undefined, lists: ListData[]) {
@@ -94,7 +97,7 @@ export function SelectedList() {
       body: JSON.stringify(newItem),
     };
     try {
-      await fetch(`http://localhost:4000/lists/${id}`, options);
+      await fetch(apiUrl + `/lists/${id}`, options);
     } catch (err) {
       console.log('Failed to save item to database', err);
     }
@@ -110,7 +113,7 @@ export function SelectedList() {
           'content-type': 'application/json',
         },
       };
-      await fetch(`http://localhost:4000/lists/${id}/${itemId}`, options);
+      await fetch(apiUrl + `/lists/${id}/${itemId}`, options);
     } catch (err) {
       console.error('Could not delete list item'), err;
     }
@@ -125,7 +128,7 @@ export function SelectedList() {
       body: JSON.stringify({ list_name: name }),
     };
     try {
-      const res = await fetch(`http://localhost:4000/lists/${id}`, options);
+      const res = await fetch(apiUrl + `lists/${id}`, options);
       res.ok && console.log('updated');
     } catch (err) {
       console.error('Could not update list name', err);

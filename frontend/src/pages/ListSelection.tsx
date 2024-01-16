@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { fetchData } from '../utils/fetchData';
-import { ListData } from '../types';
+import { ListData } from '../typings/types';
 import { useListContext } from '../context/listContext';
 import { isList } from '../utils/typeGuard';
 import { Modal } from '../components/UI/Modal';
@@ -14,6 +14,8 @@ export type FocusedList = {
   listName: string;
   listId: number;
 };
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export function ListSelection() {
   const { listData, updateListData } = useListContext();
@@ -39,7 +41,7 @@ export function ListSelection() {
       },
     };
     try {
-      const data = await fetchData<ListData[]>(`http://localhost:4000/lists/${id}`, options);
+      const data = await fetchData<ListData[]>(apiUrl + `/lists/${id}`, options);
       if (data !== undefined && isList(data)) {
         const newList = listData.filter((list: ListData) => list.list_id !== id);
         updateListData(newList);
@@ -75,7 +77,7 @@ export function ListSelection() {
   useEffect(() => {
     async function getLists() {
       try {
-        const data = await fetchData<ListData[] | string>('http://localhost:4000/lists');
+        const data = await fetchData<ListData[] | string>(apiUrl + '/lists');
         if (data !== undefined && isList(data)) {
           updateListData(data);
         }
