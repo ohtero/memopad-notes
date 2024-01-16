@@ -3,7 +3,7 @@ export interface ListData {
   list_name: string;
 }
 
-export interface ListItemType {
+export interface ListItem {
   list_item_id: string;
   list_item_value: string;
   completed: boolean;
