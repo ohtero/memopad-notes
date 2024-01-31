@@ -1,78 +1,42 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
-import { fetchData } from '../utils/fetchData';
-import { useListContext } from '../context/listContext';
-import { ListData, ListItem } from '../typings/types';
+import { useLocation, useParams } from 'react-router-dom';
+import { useFetch } from '../hooks/useFetch';
+import { ListItem } from '../typings/types';
 import { Item } from '../components/ListItem';
-import { isListValues, isString } from '../utils/typeGuard';
 import { ListSelector } from './ListSelection';
 import { Button, MenuButton } from '../components/UI/Button';
 import { ChevronDownIcon, ChevronUpIcon, EditIcon } from '../assets/Icons';
 import { Modal } from '../components/UI/Modal';
 import { Paragraph } from '../components/UI/Paragraph';
 import { Device } from '../assets/breakpoints';
+import { isListValueArray } from '../utils/typeGuard';
+import { modifyRequest } from '../utils/modifyRequest';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export function SelectedList() {
-  const [listName, setListName] = useState<string>('');
-  const [editableListName, setEditableListName] = useState<string>('');
-  const [items, setItems] = useState<ListItem[]>([]);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [showInput, setShowInput] = useState<boolean>(false);
+type State = {
+  state: { listName: string; showInput: boolean };
+};
 
+function toInt(value: string | undefined) {
+  if (value) {
+    return parseInt(value);
+  }
+}
+
+export function SelectedList() {
   const { id } = useParams();
-  const { listData } = useListContext();
+  const listId = toInt(id);
+  const { state } = useLocation() as State;
+  const { data, isPending, error, setFetchParams } = useFetch({ method: 'GET', operation: 'getSingleList', listId: toInt(id) });
+
+  const [listName, setListName] = useState<string>(state.listName);
+  const [editableListName, setEditableListName] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
+  const [showInput, setShowInput] = useState<boolean>(state.showInput || false);
 
   const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-    };
-
-    async function getListItems() {
-      try {
-        const data = await fetchData<ListItem[] | undefined>(apiUrl + `/lists/${id}`, options);
-        if (data !== undefined && isListValues(data)) {
-          setItems([...items, ...data]);
-        }
-      } catch (err) {
-        console.error('failed to fetch list data', err);
-      }
-    }
-    void getListItems();
-    const selectedListName = getListName(id, listData as ListData[]);
-    selectedListName && setListName(selectedListName);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function getListName(listId: string | undefined, lists: ListData[]) {
-    if (isString(listId)) {
-      const selectedList = lists.filter((list) => list.list_id === parseInt(listId));
-      return selectedList[0].list_name;
-    }
-  }
-
-  function createListComponents() {
-    const components: React.ReactNode[] = items.map(({ list_item_id, list_item_value, completed }) => {
-      return (
-        <Item
-          key={list_item_id}
-          listId={id as string}
-          itemId={list_item_id}
-          value={list_item_value}
-          completed={completed}
-          handleClick={() => void deleteListItem(list_item_id)}
-        />
-      );
-    });
-    return components;
-  }
 
   function toggleInputVisibility(state: boolean) {
     !state ? setShowInput(true) : setShowInput(false);
@@ -82,40 +46,34 @@ export function SelectedList() {
     if (inputValue.trim().length > 0) {
       const itemId: string = crypto.randomUUID();
       const newItem: ListItem = { list_item_id: itemId, list_item_value: inputValue, completed: false };
-      setItems([...items, newItem]);
       void postListItem(newItem);
     }
     setInputValue('');
   }
 
-  async function postListItem(newItem: ListItem) {
-    const options = {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(newItem),
-    };
-    try {
-      await fetch(apiUrl + `/lists/${id}`, options);
-    } catch (err) {
-      console.log('Failed to save item to database', err);
-    }
+  function postListItem(newItem: ListItem) {
+    setFetchParams({ method: 'POST', operation: 'postListItem', body: newItem, listId: listId });
   }
 
-  async function deleteListItem(itemId: string) {
-    const filteredItems = items.filter((item) => item.list_item_id !== itemId);
-    setItems(filteredItems);
-    try {
-      const options = {
-        method: 'DELETE',
-        headers: {
-          'content-type': 'application/json',
-        },
-      };
-      await fetch(apiUrl + `/lists/${id}/${itemId}`, options);
-    } catch (err) {
-      console.error('Could not delete list item'), err;
+  function deleteListItem(itemId: string) {
+    setFetchParams({ method: 'DELETE', operation: 'deleteListItem', listId: listId, itemId: itemId });
+  }
+
+  function createListComponents(items: ListItem[]) {
+    if (items) {
+      const components: React.ReactNode[] = items.map(({ list_item_id, list_item_value, completed }) => {
+        return (
+          <Item
+            key={list_item_id}
+            listId={id as string}
+            itemId={list_item_id}
+            value={list_item_value}
+            completed={completed}
+            handleClick={() => void deleteListItem(list_item_id)}
+          />
+        );
+      });
+      return components;
     }
   }
 
@@ -127,46 +85,56 @@ export function SelectedList() {
       },
       body: JSON.stringify({ list_name: name }),
     };
-    try {
-      const res = await fetch(apiUrl + `/lists/${id}`, options);
-      res.ok && console.log('updated');
-    } catch (err) {
-      console.error('Could not update list name', err);
+
+    const res = await modifyRequest<string>(apiUrl + `/lists/${id}`, options);
+    if (!res.success) {
+      console.error('Could not update list name', res.error);
       setListName(oldName);
     }
   }
 
   return (
     <>
-      <TopWrapper>
-        <Header>
-          <ListNameWrapper>
-            <ListName>{listName}</ListName>
-            <EditNameButton
-              onClick={() => {
-                setEditableListName(listName);
-                dialogRef.current?.showModal();
-              }}
-            >
-              <EditIcon height={'1.25rem'} />
-            </EditNameButton>
-          </ListNameWrapper>
-          <ShowInputButton onClick={() => toggleInputVisibility(showInput)}>{!showInput ? <ChevronDownIcon /> : <ChevronUpIcon />}</ShowInputButton>
-        </Header>
-        {showInput && (
-          <InputWrapper>
-            <Input
-              type="text"
-              placeholder="Lisää listaan..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && createListItem()}
-            />
-            <AddButton onClick={() => createListItem()}>lisää</AddButton>
-          </InputWrapper>
-        )}
-      </TopWrapper>
-      <ItemsList>{createListComponents()}</ItemsList>
+      {data ? (
+        <>
+          <TopWrapper>
+            <Header>
+              <ListNameWrapper>
+                <ListName>{listName}</ListName>
+                <EditNameButton
+                  onClick={() => {
+                    setEditableListName(listName);
+                    dialogRef.current?.showModal();
+                  }}
+                >
+                  <EditIcon height={'1.25rem'} />
+                </EditNameButton>
+              </ListNameWrapper>
+              <ShowInputButton onClick={() => toggleInputVisibility(showInput)}>
+                {!showInput ? <ChevronDownIcon /> : <ChevronUpIcon />}
+              </ShowInputButton>
+            </Header>
+            {showInput && (
+              <InputWrapper>
+                <Input
+                  type="text"
+                  placeholder="Lisää listaan..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && createListItem()}
+                />
+                <AddButton onClick={() => createListItem()}>lisää</AddButton>
+              </InputWrapper>
+            )}
+          </TopWrapper>
+          <ItemsList>{isListValueArray(data) && createListComponents(data)}</ItemsList>
+        </>
+      ) : isPending ? (
+        <p>Ladataan listaa</p>
+      ) : error ? (
+        <p>Virhe</p>
+      ) : null}
+
       <Modal ref={dialogRef}>
         <Paragraph $bold>Muokkaa nimeä</Paragraph>
         <ListNameInput value={editableListName} onChange={(e) => setEditableListName(e.target.value)} />

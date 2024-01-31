@@ -1,96 +1,61 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { fetchData } from '../utils/fetchData';
+import { useFetch } from '../hooks/useFetch';
 import { ListData } from '../typings/types';
-import { useListContext } from '../context/listContext';
-import { isList } from '../utils/typeGuard';
 import { Modal } from '../components/UI/Modal';
 import { DeleteIcon } from '../assets/Icons';
 import { MenuButton } from '../components/UI/Button';
 import { Paragraph } from '../components/UI/Paragraph';
+import { isList } from '../utils/typeGuard';
 
 export type FocusedList = {
   listName: string;
   listId: number;
 };
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
 export function ListSelection() {
-  const { listData, updateListData } = useListContext();
-  const [listComponents, setListComponents] = useState<React.ReactNode[]>([]);
+  const { data, error, isPending, setFetchParams } = useFetch({ method: 'GET', operation: 'getLists' });
   const [focusedList, setFocusedList] = useState<FocusedList>({ listName: '', listId: 0 });
-
   const dialogRef = useRef<HTMLDialogElement>(null);
-
   const navigate = useNavigate();
 
-  const navigateCallback = useCallback(
-    (listId: number) => {
-      navigate(`/list/${listId}`);
-    },
-    [navigate]
-  );
-
-  async function deleteTargetList(id: number) {
-    const options = {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-      },
-    };
-    try {
-      const data = await fetchData<ListData[]>(apiUrl + `/lists/${id}`, options);
-      if (data !== undefined && isList(data)) {
-        const newList = listData.filter((list: ListData) => list.list_id !== id);
-        updateListData(newList);
-      }
-    } catch (err) {
-      console.error('Could not delete list', err);
-    }
+  function deleteTargetList(listId: number) {
+    setFetchParams({ method: 'DELETE', operation: 'deleteList', listId: listId });
   }
 
-  useEffect(() => {
-    function createListEntries(data: ListData[]) {
-      const components = data.map(({ list_id, list_name }) => {
-        return (
-          <ListItem key={list_id}>
-            <ListSelectorButton onClick={() => navigateCallback(list_id)}>{list_name}</ListSelectorButton>
-            <ListDeleteButton
-              onClick={() => {
-                setFocusedList({ listName: list_name, listId: list_id });
-                dialogRef.current?.showModal();
-              }}
-            >
-              <DeleteIcon $dark height={'2rem'} />
-            </ListDeleteButton>
-          </ListItem>
-        );
-      });
-      return components;
-    }
-    const entries = createListEntries(listData as ListData[]);
-    setListComponents(entries);
-  }, [listData, navigateCallback]);
+  function navigateToList(listId: number, listName: string) {
+    navigate(`/list/${listId}`, { state: { listName: listName } });
+  }
 
-  useEffect(() => {
-    async function getLists() {
-      try {
-        const data = await fetchData<ListData[] | string>(apiUrl + '/lists');
-        if (data !== undefined && isList(data)) {
-          updateListData(data);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    void getLists();
-  }, [navigateCallback, updateListData]);
+  function createListEntries(data: ListData[]) {
+    const listComponents = data.map(({ list_id, list_name }) => {
+      return (
+        <ListItem key={list_id} id={list_id} target={focusedList.listId} $pending={isPending}>
+          <ListSelectorButton onClick={() => navigateToList(list_id, list_name)}>{list_name}</ListSelectorButton>
+          <ListDeleteButton
+            onClick={() => {
+              setFocusedList({ listName: list_name, listId: list_id });
+              dialogRef.current?.showModal();
+            }}
+          >
+            <DeleteIcon $dark height={'2rem'} />
+          </ListDeleteButton>
+        </ListItem>
+      );
+    });
+    return listComponents;
+  }
 
   return (
     <>
-      <ListSelector>{listComponents}</ListSelector>
+      {data ? (
+        <ListSelector>{isList(data) && createListEntries(data)}</ListSelector>
+      ) : isPending ? (
+        <p>Ladataan listoja...</p>
+      ) : error ? (
+        <p>Listojen lataaminen epäonnistui</p>
+      ) : null}
       <Modal ref={dialogRef}>
         <Paragraph>Haluatko poistaa listan</Paragraph>
         <Paragraph $bold>{focusedList.listName}?</Paragraph>
@@ -124,13 +89,14 @@ export const ListSelector = styled.ul`
   gap: 0.75rem;
   list-style: none;
 `;
-const ListItem = styled.li`
+const ListItem = styled.li<{ $pending: boolean; target: number | null; id: number }>`
   display: flex;
   align-items: center;
   width: 100%;
   border: 0;
   border-radius: 5px;
   font-size: 1rem;
+  opacity: ${(props) => (props.$pending && props.id === props.target ? '50%' : '100%')};
   background: ${(props) => props.theme.colors.secondary};
   box-shadow: ${(props) => props.theme.shadows.extraSmall};
   &:hover {
