@@ -1,29 +1,23 @@
 import styled from 'styled-components';
 import { MenuButton } from './UI/Button';
 import { useNavigate } from 'react-router-dom';
-import { fetchData } from '../utils/fetchData';
-import { ListData } from '../typings/types';
-import { isList } from '../utils/typeGuard';
-import { useListContext } from '../context/listContext';
+import { modifyRequest as newListRequest } from '../utils/modifyRequest';
+
+type ListId = {
+  list_id: number;
+};
 
 export function OptionMenu() {
   const navigate = useNavigate();
-  const { addListData } = useListContext();
 
   async function createNewList() {
-    const options = {
-      method: 'POST',
-    };
-
-    try {
-      const data = await fetchData<ListData[]>('http://localhost:4000/lists', options);
-      if (data !== undefined && isList(data)) {
-        const id = data[0].list_id;
-        addListData(data);
-        navigate(`/list/${id}`);
-      }
-    } catch (err) {
-      console.error('Could not create new list: ', err);
+    const res = await newListRequest<ListId>('http://localhost:4000/lists');
+    if (!res.success) {
+      console.log(res.error);
+    }
+    if (res.data) {
+      const id = res.data.list_id;
+      navigate(`/list/${id}`, { state: { listName: 'Uusi lista', showInput: true } });
     }
   }
 

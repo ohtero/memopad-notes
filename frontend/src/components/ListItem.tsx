@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { DeleteIcon, EditIcon } from '../assets/Icons';
 import { Device } from '../assets/breakpoints';
+import { modifyRequest } from '../utils/modifyRequest';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -29,15 +30,12 @@ export function Item({ listId, itemId, value, completed, handleClick }: ListItem
       },
       body: JSON.stringify({ list_item_value: itemValue }),
     };
-
     if (initItemValue !== itemValue) {
-      try {
-        await fetch(apiUrl + `/lists/${listId}/${itemId}`, options);
-      } catch (err) {
-        console.error('Could not update list item', err);
-      } finally {
-        setInitItemValue('');
+      const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}`, options);
+      if (!res.success) {
+        console.error('Could not update list item', res.error);
       }
+      setInitItemValue('');
     }
   }
 
@@ -48,13 +46,9 @@ export function Item({ listId, itemId, value, completed, handleClick }: ListItem
         'content-type': 'application/json',
       },
     };
-    try {
-      const res = await fetch(apiUrl + `/lists/${listId}/${itemId}/${!isCompleted}`, options);
-      if (res.status === 500) {
-        console.error('Internal server error');
-      }
-    } catch (err) {
-      console.error('Could not update completion state: ', err);
+    const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}/${!isCompleted}`, options);
+    if (!res.success) {
+      console.error('Could not update completion state: ', res.error);
     }
   }
 
@@ -111,9 +105,6 @@ const ItemContainer = styled.div<{ $completed?: boolean }>`
   box-shadow: ${(props) => props.theme.shadows.extraSmall};
   opacity: ${(props) => props.$completed && '50%'};
 `;
-// @media (max-width: ${Device.sm}) {
-// padding: clamp(0.5rem, 3vw, 0.75rem) 0.5rem;
-// }
 
 const TextContainer = styled.div`
   flex-basis: 100%;
