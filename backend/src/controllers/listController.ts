@@ -23,8 +23,19 @@ async function getAllLists(req: Request, res: Response) {
 async function getSingleList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const list_id = req.params.list;
+
+  const query = `
+    SELECT 
+      list_item_id,
+      list_item_value,
+      completed
+    FROM
+      list_items
+    WHERE 
+      list_id = ${list_id}  
+  `;
   try {
-    const listData = await client.query(`SELECT list_item_id, list_item_value, completed FROM list_items WHERE list_id = ${list_id}`);
+    const listData = await client.query(query);
     res.json(listData.rows);
   } catch (err) {
     console.log('Could not send list information', err);
@@ -36,10 +47,11 @@ async function getSingleList(req: Request, res: Response) {
 async function createNewList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   try {
-    const listData = await client.query('INSERT INTO lists (list_name) VALUES ($1) RETURNING *', ['Uusi lista']);
-    res.json(listData.rows);
+    const listData = await client.query('INSERT INTO lists (list_name) VALUES ($1) RETURNING list_id', ['Uusi lista']);
+    res.json(listData.rows[0]).status(200);
   } catch (err) {
     console.log('Could not create new list', err);
+    res.send().status(500);
   } finally {
     client.release();
   }
@@ -49,8 +61,9 @@ async function deleteList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const list_id = req.params.list;
   try {
-    const listData = await client.query(`DELETE FROM lists WHERE (list_id) = ${list_id} RETURNING *`);
-    res.json(listData.rows).status(200);
+    console.log(`deleting list ${list_id}`);
+    await client.query(`DELETE FROM lists WHERE (list_id) = ${list_id} RETURNING *`);
+    res.send({}).status(200);
   } catch (err) {
     console.error('Error when deleting list', err);
   } finally {
@@ -69,7 +82,7 @@ async function addListItem(req: Request, res: Response) {
       list_item_value,
       completed,
     ]);
-    res.json('List saved').status(200);
+    res.json({}).status(200);
   } catch (err) {
     console.error('Error saving list item', err);
   } finally {
@@ -78,11 +91,12 @@ async function addListItem(req: Request, res: Response) {
 }
 
 async function deleteListItem(req: Request, res: Response) {
+  console.log(req.url);
   const client = req.dbClient as PoolClient;
   const list_item_id = req.params.item;
   try {
     await client.query('DELETE FROM list_items WHERE (list_item_id) = ($1)', [list_item_id]);
-    res.send().status(200);
+    res.send({}).status(200);
   } catch (err) {
     console.error('Error deleting list item', err);
   } finally {
@@ -96,7 +110,7 @@ async function updateListItem(req: Request, res: Response) {
   const list_item_id = req.params.item;
   try {
     await client.query('UPDATE list_items SET list_item_value = ($2) WHERE (list_item_id) = ($1)', [list_item_id, list_item_value]);
-    res.send().status(200);
+    res.send({}).status(200);
   } catch (err) {
     console.error('Error updating list item', err);
   } finally {
@@ -111,7 +125,7 @@ async function updateCompletionState(req: Request, res: Response) {
 
   try {
     await client.query('UPDATE list_items SET completed = ($2) WHERE list_item_id = ($1)', [list_item_id, completed]);
-    res.send().status(200);
+    res.send({}).status(200);
   } catch (err) {
     console.log('Error updating list completion state: ', err);
     res.send().status(500);
@@ -126,7 +140,7 @@ async function updateListName(req: Request, res: Response) {
   const list_id = req.params.list;
   try {
     await client.query('UPDATE lists SET list_name = ($2) WHERE (list_id) = ($1)', [list_id, list_name]);
-    res.send().status(200);
+    res.send({}).status(200);
   } catch (err) {
     console.error('Error updating list item', err);
     res.send().status(500);
