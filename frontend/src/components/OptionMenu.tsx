@@ -17,7 +17,6 @@ export function OptionMenu() {
     }
     if (res.data) {
       const id = res.data.list_id;
-      console.log('🚀 ~ createNewList ~ id:', id);
       navigate(`/list/${id}`, { state: { listName: 'Uusi lista', showInput: true } });
     }
   }
