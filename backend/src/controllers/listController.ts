@@ -61,7 +61,6 @@ async function deleteList(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const list_id = req.params.list;
   try {
-    console.log(`deleting list ${list_id}`);
     await client.query(`DELETE FROM lists WHERE (list_id) = ${list_id} RETURNING *`);
     res.send({}).status(200);
   } catch (err) {
