@@ -7,11 +7,13 @@ type ListId = {
   list_id: number;
 };
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export function OptionMenu() {
   const navigate = useNavigate();
 
   async function createNewList() {
-    const res = await newListRequest<ListId>('http://localhost:4000/lists');
+    const res = await newListRequest<ListId>(`${apiUrl}/lists`);
     if (!res.success) {
       console.log(res.error);
     }
