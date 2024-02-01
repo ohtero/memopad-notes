@@ -4,6 +4,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import { listRouter } from './routes/listRouter';
 import { connectToDb } from './middleware/connectToDb';
+import checkPreflightOptions from './middleware/preflightCheck';
 
 const app = express();
 
@@ -30,8 +31,9 @@ const corsOptions = {
   methods: 'GET, POST, PATCH, DELETE',
 };
 
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(checkPreflightOptions);
 
 app.use('/lists', connectToDb, listRouter);
 
