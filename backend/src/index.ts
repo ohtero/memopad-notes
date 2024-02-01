@@ -26,8 +26,8 @@ pool.on('error', (err) => {
 });
 
 const corsOptions = {
-  origin: 'https://memopad-notes-frontend.onrender.com',
-  'access-control-allow-methods': 'GET, POST, PATCH, DELETE',
+  origin: '*',
+  methods: 'GET, POST, PATCH, DELETE',
 };
 
 app.use(express.json());
