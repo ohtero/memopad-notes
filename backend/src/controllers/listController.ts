@@ -33,6 +33,8 @@ async function getSingleList(req: Request, res: Response) {
       list_items
     WHERE 
       list_id = ${list_id}  
+    ORDER BY 
+      index
   `;
   try {
     const listData = await client.query(query);
