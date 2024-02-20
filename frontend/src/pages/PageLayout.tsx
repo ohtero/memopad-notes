@@ -13,7 +13,9 @@ export function PageLayout() {
       <ListNameProvider>
         <PageContainer>
           <DesktopView>
-            <Header>MEMOPAD NOTES</Header>
+            <Header>
+              <Heading>MEMOPAD NOTES</Heading>
+            </Header>
             <Main>
               <ListSelection />
               <ListWrapper>
@@ -45,7 +47,8 @@ const PageContainer = styled.div`
   display: grid;
   grid-template-rows: [header-start] auto [header-end main-start] auto [main-end];
   grid-template-columns: [left-start] 1fr [left-end mid-start] 40% [mid-end right-start] 1fr [right-end];
-  column-gap: clamp(0rem, 3vw, 4rem);
+  column-gap: clamp(1rem, 3vw, 4rem);
+  row-gap: 2rem;
 
   @media (max-width: ${Device.sm}) {
     grid-template-rows: [main-start] auto [main-end];
@@ -54,8 +57,29 @@ const PageContainer = styled.div`
 `;
 
 const Header = styled.header`
+  display: flex;
   grid-row: header-start / header-end;
   grid-column: left-start / right-end;
+  align-items: center;
+  justify-content: center;
+  padding-left: 2rem;
+  // background: linear-gradient(
+  //     deg,
+  //     HSLA(${(props) => props.theme.colors.primary}, 0.05) 20%,
+  //     HSLA(${(props) => props.theme.colors.secondary}, 0.1) 80%
+  //   ),
+  //   linear-gradient(330deg, HSLA(${(props) => props.theme.colors.primary}, 0.1) 50%, HSLA(${(props) => props.theme.colors.secondary}, 0.1) 50%),
+  //   linear-gradient(220deg, HSLA(${(props) => props.theme.colors.primary}, 0.1) 70%, HSLA(${(props) => props.theme.colors.secondary}, 0.1) 70%),
+  //   linear-gradient(270deg, HSLA(${(props) => props.theme.colors.primary}, 1), HSLA(${(props) => props.theme.colors.secondary}, 1));
+  border-bottom: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
+`;
+
+const Heading = styled.h1`
+  padding: 0.5rem 2rem;
+  letter-spacing: 0.75rem;
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
+  border-left: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
+  border-right: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
 `;
 
 const Main = styled.main`
