@@ -18,12 +18,12 @@ const ModalContainer = styled.dialog`
   width: min(100vw, 20rem);
   margin: auto;
   border: 0;
-  border-radius: 5px;
-  background: ${(props) => props.theme.colors.main};
-  color: ${(props) => props.theme.colors.offWhite};
-  box-shadow: ${(props) => props.theme.shadows.extraSmall};
+  border-radius: 3px;
+  background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
+  box-shadow: ${(props) => props.theme.shadows.bottomSmall};
   &::backdrop {
-    background: HSLA(0, 0%, 0%, 0.5);
+    background: HSLA(0, 0%, 0%, 0.25);
   }
 `;
 
