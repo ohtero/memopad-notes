@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { DeleteIcon, EditIcon } from '../assets/Icons';
-import { Device } from '../assets/breakpoints';
 import { modifyRequest } from '../utils/modifyRequest';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -112,9 +111,6 @@ const TextContainer = styled.div`
   flex-basis: 100%;
   position: relative;
   padding: 0.75rem 0.5rem;
-  @media (max-width: ${Device.sm}) {
-    padding: clamp(0.5rem, 3vw, 0.75rem) 0.5rem;
-  }
 `;
 
 const Overlay = styled.div<{ disabled: boolean }>`
@@ -143,9 +139,6 @@ const ItemText = styled.input<{ disabled: boolean }>`
   &:focus {
     box-shadow: ${(props) => (props.readOnly ? 'none' : '#444 0px 2px')};
   }
-  @media (max-width: ${Device.sm}) {
-    font-size: clamp(0.8rem, 4vw, 1rem);
-  }
 `;
 
 const ButtonContainer = styled.div`
@@ -153,9 +146,6 @@ const ButtonContainer = styled.div`
   gap: 0.5rem;
   padding-right: 0.5rem;
   align-items: center;
-  @media (max-width: ${Device.sm}) {
-    gap: clamp(0rem, 1vw, 0.5rem);
-  }
 `;
 
 const EditButton = styled.button`
