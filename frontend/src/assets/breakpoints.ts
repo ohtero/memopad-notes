@@ -3,7 +3,7 @@ type Size = {
 };
 
 const size: Size = {
-  sm: '700px',
+  sm: '1079px',
 };
 
 export const Device = {
