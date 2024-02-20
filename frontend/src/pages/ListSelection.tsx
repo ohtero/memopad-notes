@@ -11,6 +11,7 @@ import { Paragraph } from '../components/UI/Paragraph';
 import { isList } from '../utils/typeGuard';
 import AddNewListButton from '../components/AddNewListButton';
 import { Device } from '../assets/breakpoints';
+import { DesktopView, MobileView } from '../config/screensize';
 
 export type FocusedList = {
   listName: string;
@@ -82,9 +83,14 @@ export function ListSelection() {
   return (
     <>
       <ComponentWrapper>
-        <AddButtonWrapper>
-          <AddNewListButton handleClick={syncLists} />
-        </AddButtonWrapper>
+        <TopWrapper>
+          <DesktopView>
+            <AddNewListButton handleClick={syncLists} />
+          </DesktopView>
+          <MobileView>
+            <Header>My Lists</Header>
+          </MobileView>
+        </TopWrapper>
         {listIdData ? (
           <ListSelector>{isList(listIdData) && createListEntries(listIdData)}</ListSelector>
         ) : isPending ? (
@@ -121,22 +127,34 @@ export function ListSelection() {
 const ComponentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 70%;
+  width: clamp(18rem, 20vw, 30rem);
   height: 80vh;
   height: 80svh;
-  margin-right: 30rem;
-  background: HSLA(${(props) => props.theme.colors.primary}, 0.4);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(7px);
+  background: HSLA(${(props) => props.theme.colors.primary}, 0.25);
   box-shadow: ${(props) => props.theme.shadows.bottomSmall};
   padding: 1rem;
   overflow: hidden;
   @media (max-width: ${Device.sm}) {
+    background: none;
     width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
   }
 `;
 
-const AddButtonWrapper = styled.div`
+const TopWrapper = styled.div`
   padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+  @media (max-width: ${Device.sm}) {
+    padding: 1.025rem;
+    margin: 0;
+  }
+`;
+
+const Header = styled.h3`
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
 `;
 
 export const ListSelector = styled.ul`
@@ -144,7 +162,7 @@ export const ListSelector = styled.ul`
   flex-direction: column;
   height: 100%;
   padding: 0.5rem;
-  margin-top: 0.5rem;
+  // margin-top: 0.5rem;
   gap: 0.75rem;
   border-top: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
   border-bottom: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
