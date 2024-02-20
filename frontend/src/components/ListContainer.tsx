@@ -19,12 +19,12 @@ const Container = styled.div`
   padding: 1rem;
   border-radius: 3px;
   overflow-y: hidden;
-  background: HSLA(${(props) => props.theme.colors.primary}, 0.4);
-  backdrop-filter: blur(5px);
+  background: HSLA(${(props) => props.theme.colors.primary}, 0.25);
+  backdrop-filter: blur(7px);
   box-shadow: ${(props) => props.theme.shadows.bottomSmall};
 
   @media (max-width: ${Device.sm}) {
-    padding: 0.5rem 0 0 0;
+    padding: 0 0 0 0;
     box-shadow: none;
   }
 `;
