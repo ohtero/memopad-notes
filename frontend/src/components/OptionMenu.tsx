@@ -19,7 +19,7 @@ export function OptionMenu() {
     }
     if (res.data) {
       const id = res.data.list_id;
-      navigate(`/list/${id}`, { state: { listName: 'Uusi lista', showInput: true } });
+      navigate(`/list/${id}`, { state: { listId: id, listName: 'Uusi lista', showInput: true } });
     }
   }
 
@@ -38,9 +38,10 @@ export function OptionMenu() {
 }
 
 const Menu = styled.nav`
-  grid-row: 2 / 3;
+  height: fit-content;
+  grid-row: list-footer-start / list-footer-end;
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
-  background: ${(props) => props.theme.colors.menuBackground};
+  // background: HSLA(${(props) => props.theme.colors.primary}, 1);
 `;
