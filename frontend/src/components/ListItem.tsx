@@ -98,12 +98,14 @@ export function Item({ listId, itemId, value, completed, handleClick }: ListItem
 
 const ItemContainer = styled.div<{ $completed?: boolean }>`
   display: flex;
-  background: ${(props) => props.theme.colors.secondary};
   gap: 0.5rem;
+  margin: 0 0.5rem;
   align-items: center;
-  border-radius: 5px;
-  box-shadow: ${(props) => props.theme.shadows.extraSmall};
+  border-radius: 3px;
+  background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
   opacity: ${(props) => props.$completed && '50%'};
+  backdrop-filter: blur(5px);
+  border: 3px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
 `;
 
 const TextContainer = styled.div`
@@ -133,7 +135,7 @@ const ItemText = styled.input<{ disabled: boolean }>`
   border: none;
   outline: none;
   background: inherit;
-  color: ${(props) => props.theme.colors.background};
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
   cursor: ${(props) => props.readOnly && 'default'};
   &::selection {
     background: ${(props) => props.readOnly && 'none'};
