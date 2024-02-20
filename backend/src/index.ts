@@ -17,7 +17,7 @@ const { Pool } = pg;
 
 export const pool = new Pool({
   connectionString: connectionString,
-  max: 10,
+  max: 50,
   idleTimeoutMillis: 100000,
 });
 
