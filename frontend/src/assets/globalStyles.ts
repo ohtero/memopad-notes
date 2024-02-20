@@ -10,42 +10,41 @@ export const GlobalStyles = createGlobalStyle`
 }
 body {
   background: 
-    // radial-gradient(
-    //   circle 500px at 80% 0%,
-    //   HSLA(${(props) => props.theme.colors.primary}, 0.75),
-    //   transparent
-    //   ),
-    // radial-gradient(
-    //   circle 500px at 100% 90%,
-    //   HSLA(${(props) => props.theme.colors.primary}, 0.75),
-    //   transparent
-    //   ),
-    // radial-gradient(
-    //   circle 400px at 60% 100%,
-    //   HSLA(${(props) => props.theme.colors.primary}, 0.5),
-    //   transparent
-    //   ),
     linear-gradient(
-      130deg,
-      HSLA(${(props) => props.theme.colors.primary}, 0.05) 50%,
-      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 50%
+      100deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.05) 71%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 71%
     ),
     linear-gradient(
-      330deg,
-      HSLA(${(props) => props.theme.colors.primary}, 0.1) 50%,
-      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 50%
+      125deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.1) 75%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 75%
     ),
     linear-gradient(
-      220deg,
-      HSLA(${(props) => props.theme.colors.primary}, 0.1) 70%,
-      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 70%
+      150deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.1) 80%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 80%
+    ),
+    linear-gradient(
+      175deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.05) 90%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 90%
+    ),
+    linear-gradient(
+      70deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.1) 60%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 60%
+    ),
+    linear-gradient(
+      25deg,
+      HSLA(${(props) => props.theme.colors.primary}, 0.1) 35%,
+      HSLA(${(props) => props.theme.colors.secondary}, 0.1) 35%
     ),
     linear-gradient(
       270deg,
       HSLA(${(props) => props.theme.colors.primary}, 1),
       HSLA(${(props) => props.theme.colors.secondary}, 1)
     )
-    
   ;
 
   justify-content: center;
