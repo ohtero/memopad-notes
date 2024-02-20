@@ -7,7 +7,7 @@ type IconProps = {
 
 function ChevronDownIcon() {
   return (
-    <Icon height="2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <Icon height="2.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M6 9L12 15L18 9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </Icon>
   );
@@ -15,7 +15,7 @@ function ChevronDownIcon() {
 
 function ChevronUpIcon() {
   return (
-    <Icon height="2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <Icon height="2.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M6 15L12 9L18 15" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </Icon>
   );
@@ -54,7 +54,7 @@ function EditIcon({ $dark, height }: IconProps) {
 }
 
 const Icon = styled.svg<{ $dark?: boolean; height: string }>`
-  height: clamp(calc(${(props) => props.height} - 0.2rem), 6vw, ${(props) => props.height});
+  height: ${(props) => props.height};
   stroke: HSLA(${(props) => (props.$dark ? props.theme.colors.primaryDark : props.theme.colors.secondaryLight)}, 1);
   &:hover {
     cursor: pointer;
