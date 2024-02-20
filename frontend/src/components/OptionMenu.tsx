@@ -25,13 +25,13 @@ export function OptionMenu() {
 
   return (
     <Menu>
-      <MenuButton handleClick={() => navigate('/')}>Listat</MenuButton>
+      <MenuButton handleClick={() => navigate('/')}>My Lists</MenuButton>
       <MenuButton
         handleClick={() => {
           void createNewList();
         }}
       >
-        Luo lista
+        Add List
       </MenuButton>
     </Menu>
   );
