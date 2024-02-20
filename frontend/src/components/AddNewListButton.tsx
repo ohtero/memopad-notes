@@ -27,5 +27,5 @@ export default function AddNewListButton({ handleClick }: AddNewListButtonProps)
     }
   }
 
-  return <MenuButton handleClick={() => void createNewList()}>Add list</MenuButton>;
+  return <MenuButton handleClick={() => void createNewList()}>Add List</MenuButton>;
 }
