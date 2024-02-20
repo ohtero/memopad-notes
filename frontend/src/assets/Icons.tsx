@@ -55,7 +55,7 @@ function EditIcon({ $dark, height }: IconProps) {
 
 const Icon = styled.svg<{ $dark?: boolean; height: string }>`
   height: clamp(calc(${(props) => props.height} - 0.2rem), 6vw, ${(props) => props.height});
-  stroke: ${(props) => (props.$dark ? props.theme.colors.menuBackground : props.theme.colors.highlight)};
+  stroke: HSLA(${(props) => (props.$dark ? props.theme.colors.primaryDark : props.theme.colors.secondaryLight)}, 1);
   &:hover {
     cursor: pointer;
     filter: ${(props) => (props.$dark ? 'drop-shadow(1px 1px 1px #666) brightness(0.8)' : 'drop-shadow(0px 0px 2px #888) brightness(1.5)')};
