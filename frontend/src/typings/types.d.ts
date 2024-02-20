@@ -13,7 +13,7 @@ export type useFetchType = {
   data: ListData[] | ListItem[] | [];
   isPending: boolean;
   error: string | null;
-  setFetchParams: (newParams: FetchParams) => void;
+  reFetch: (params: FetchParams) => void;
 };
 
 export type FetchParams = {
