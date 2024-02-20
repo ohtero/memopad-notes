@@ -13,10 +13,13 @@ export const Button = styled.button`
   width: 100%;
   padding: 1rem;
   border: 0;
-  border-radius: 5px;
   padding: 0.75rem;
   font-size: 1rem;
-  background: ${(props) => props.theme.colors.secondary};
+  border-radius: 3px;
+  background: HSLA(${(props) => props.theme.colors.secondary}, 1);
+  border: 1px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
+  border-style: inset;
+  // box-shadow: ${(props) => props.theme.shadows.extraSmall};
   &:hover {
     cursor: pointer;
     background: ${(props) => props.theme.colors.highlight};
