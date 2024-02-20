@@ -16,13 +16,14 @@ export const Button = styled.button`
   padding: 0.75rem;
   font-size: 1rem;
   border-radius: 3px;
+  letter-spacing: 0.1rem;
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
   background: HSLA(${(props) => props.theme.colors.secondary}, 1);
-  border: 1px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
-  border-style: inset;
-  // box-shadow: ${(props) => props.theme.shadows.extraSmall};
+  border: 3px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
+  // border-style: inset;
   &:hover {
     cursor: pointer;
-    background: ${(props) => props.theme.colors.highlight};
+    background: HSLA(${(props) => props.theme.colors.highlight}, 1);
   }
   &:active {
     color: #bbb;
