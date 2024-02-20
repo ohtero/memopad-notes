@@ -9,7 +9,6 @@ import { Button, MenuButton } from '../components/UI/Button';
 import { ChevronDownIcon, ChevronUpIcon, EditIcon } from '../assets/Icons';
 import { Modal } from '../components/UI/Modal';
 import { Paragraph } from '../components/UI/Paragraph';
-import { Device } from '../assets/breakpoints';
 import { isListValueArray } from '../utils/typeGuard';
 import { useListNameContext } from '../context/ListNameContext';
 
@@ -129,7 +128,7 @@ export function SelectedList() {
                     dialogRef.current?.showModal();
                   }}
                 >
-                  <EditIcon height={'1.25rem'} />
+                  <EditIcon height={'1.5rem'} />
                 </EditNameButton>
                 <ShowInputButton onClick={() => toggleInputVisibility(showInput)}>
                   {!showInput ? <ChevronDownIcon /> : <ChevronUpIcon />}
@@ -146,6 +145,7 @@ export function SelectedList() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && createListItem()}
                 />
+
                 <AddButton onClick={() => handleItemAdd()}>lisää</AddButton>
               </InputWrapper>
             )}
@@ -178,10 +178,6 @@ export function SelectedList() {
 
 const TopWrapper = styled.div`
   padding: 0.5rem 0;
-  @media (max-width: ${Device.sm}) {
-    font-size: clamp(0.8rem, 4vw, 1rem);
-    padding: clamp(0.1rem, 2vw, 0.5rem) 0;
-  }
 `;
 const Header = styled.header`
   display: flex;
@@ -191,7 +187,6 @@ const Header = styled.header`
 
 const ListNameWrapper = styled.div`
   display: flex;
-  // flex-basis: fit-content;
   align-items: center;
   overflow: hidden;
   white-space: nowrap;
@@ -231,32 +226,33 @@ const ShowInputButton = styled(Button)`
 
 const InputWrapper = styled.div`
   display: flex;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
   gap: 0.25rem;
-  height: fit-content;
+  height: 3.5rem;
 `;
 
-const Input = styled.input`
+export const Input = styled.input`
   flex-basis: 100%;
+  min-height: 100%;
   border-radius: 3px;
   font-size: 1rem;
   padding: 0.5rem;
   height: fit-content;
+  border: none;
   background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
-  @media (max-width: ${Device.sm}) {
-    font-size: clamp(0.8rem, 4vw, 1rem);
-    padding: clamp(0.25rem, 2vw, 0.5rem);
+  &:focus {
+    outline: 3px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
+    outline-offset: -3px;
   }
 `;
 const AddButton = styled(Button)`
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   flex-basis: fit-content;
   box-shadow: none;
-  @media (max-width: ${Device.sm}) {
-    font-size: clamp(0.8rem, 4vw, 1rem);
-    padding: clamp(0.25rem, 2vw, 0.5rem) 1rem;
-  }
+  height: 100%;
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
 `;
+
 const ItemsList = styled(ListSelector)`
   height: 100%;
   overflow-y: auto;
@@ -271,11 +267,11 @@ const ItemsList = styled(ListSelector)`
   }
 `;
 
-const ListNameInput = styled.input`
+const ListNameInput = styled(Input)`
   font-size: 1rem;
   padding: 0.5rem;
   margin: 1rem 0;
-  // background: HSLA$(${(props) => props.theme.colors.secondaryLight}, 1);
-  // border: 2px solid ${(props) => props.theme.colors.secondary};
-  border-radius: 5px;
+  background: white;
+  // border: 1px solid HSLA(${(props) => props.theme.colors.secondary}, 1);
+  border-radius: 3px;
 `;
