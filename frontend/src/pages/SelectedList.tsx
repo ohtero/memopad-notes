@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation, useParams } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
@@ -11,12 +11,12 @@ import { Modal } from '../components/UI/Modal';
 import { Paragraph } from '../components/UI/Paragraph';
 import { Device } from '../assets/breakpoints';
 import { isListValueArray } from '../utils/typeGuard';
-import { modifyRequest } from '../utils/modifyRequest';
+import { useListNameContext } from '../context/ListNameContext';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 type State = {
-  state: { listName: string; showInput: boolean };
+  state: { listId: number; listName: string; showInput: boolean };
 };
 
 function toInt(value: string | undefined) {
@@ -29,14 +29,23 @@ export function SelectedList() {
   const { id } = useParams();
   const listId = toInt(id);
   const { state } = useLocation() as State;
-  const { data, isPending, error, setFetchParams } = useFetch({ method: 'GET', operation: 'getSingleList', listId: toInt(id) });
+  const { data, isPending, error, reFetch } = useFetch({});
 
   const [listName, setListName] = useState<string>(state.listName);
   const [editableListName, setEditableListName] = useState<string>('');
   const [inputValue, setInputValue] = useState<string>('');
   const [showInput, setShowInput] = useState<boolean>(state.showInput || false);
+  const { updateListNameContext } = useListNameContext();
 
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const addItemBtnRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    reFetch({ method: 'GET', operation: 'getSingleList', listId: toInt(id) });
+    setListName(state.listName);
+    setShowInput(state.showInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   function toggleInputVisibility(state: boolean) {
     !state ? setShowInput(true) : setShowInput(false);
@@ -52,11 +61,11 @@ export function SelectedList() {
   }
 
   function postListItem(newItem: ListItem) {
-    setFetchParams({ method: 'POST', operation: 'postListItem', body: newItem, listId: listId });
+    reFetch({ method: 'POST', operation: 'postListItem', body: newItem, listId: listId });
   }
 
   function deleteListItem(itemId: string) {
-    setFetchParams({ method: 'DELETE', operation: 'deleteListItem', listId: listId, itemId: itemId });
+    reFetch({ method: 'DELETE', operation: 'deleteListItem', listId: listId, itemId: itemId });
   }
 
   function createListComponents(items: ListItem[]) {
@@ -85,11 +94,22 @@ export function SelectedList() {
       },
       body: JSON.stringify({ list_name: name }),
     };
+    try {
+      const res = await fetch(apiUrl + `/lists/${id}`, options);
+      if (!res.ok) {
+        setListName(oldName);
+        throw new Error(res.statusText);
+      }
+      typeof listId === 'number' && updateListNameContext({ listId: listId, listName: name });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-    const res = await modifyRequest<string>(apiUrl + `/lists/${id}`, options);
-    if (!res.success) {
-      console.error('Could not update list name', res.error);
-      setListName(oldName);
+  function handleItemAdd() {
+    createListItem();
+    if (addItemBtnRef.current) {
+      addItemBtnRef.current.focus();
     }
   }
 
@@ -101,6 +121,8 @@ export function SelectedList() {
             <Header>
               <ListNameWrapper>
                 <ListName>{listName}</ListName>
+              </ListNameWrapper>
+              <TopButtonWrapper>
                 <EditNameButton
                   onClick={() => {
                     setEditableListName(listName);
@@ -109,21 +131,22 @@ export function SelectedList() {
                 >
                   <EditIcon height={'1.25rem'} />
                 </EditNameButton>
-              </ListNameWrapper>
-              <ShowInputButton onClick={() => toggleInputVisibility(showInput)}>
-                {!showInput ? <ChevronDownIcon /> : <ChevronUpIcon />}
-              </ShowInputButton>
+                <ShowInputButton onClick={() => toggleInputVisibility(showInput)}>
+                  {!showInput ? <ChevronDownIcon /> : <ChevronUpIcon />}
+                </ShowInputButton>
+              </TopButtonWrapper>
             </Header>
             {showInput && (
               <InputWrapper>
                 <Input
+                  ref={addItemBtnRef}
                   type="text"
                   placeholder="Lisää listaan..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && createListItem()}
                 />
-                <AddButton onClick={() => createListItem()}>lisää</AddButton>
+                <AddButton onClick={() => handleItemAdd()}>lisää</AddButton>
               </InputWrapper>
             )}
           </TopWrapper>
@@ -154,8 +177,6 @@ export function SelectedList() {
 }
 
 const TopWrapper = styled.div`
-  box-shadow: ${(props) => props.theme.shadows.bottomSmall};
-  background: ${(props) => props.theme.colors.menuBackground};
   padding: 0.5rem 0;
   @media (max-width: ${Device.sm}) {
     font-size: clamp(0.8rem, 4vw, 1rem);
@@ -170,13 +191,22 @@ const Header = styled.header`
 
 const ListNameWrapper = styled.div`
   display: flex;
-  flex-basis: 100%;
+  // flex-basis: fit-content;
   align-items: center;
-  gap: 1rem;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 1rem;
 `;
 
 const ListName = styled.h3`
-  color: ${(props) => props.theme.colors.offWhite};
+  color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
+`;
+
+const TopButtonWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: 1rem;
 `;
 
 const EditNameButton = styled.button`
@@ -191,7 +221,9 @@ const ShowInputButton = styled(Button)`
   align-items: center;
   flex-basis: fit-content;
   padding: 0;
-  background: inherit;
+  background: none;
+  box-shadow: none;
+  border: none;
   &:hover {
     background: none;
   }
@@ -202,14 +234,15 @@ const InputWrapper = styled.div`
   padding: 0.5rem;
   gap: 0.25rem;
   height: fit-content;
-  background: ${(props) => props.theme.colors.menuBackground};
 `;
+
 const Input = styled.input`
   flex-basis: 100%;
-  border-radius: 5px;
+  border-radius: 3px;
   font-size: 1rem;
   padding: 0.5rem;
   height: fit-content;
+  background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
   @media (max-width: ${Device.sm}) {
     font-size: clamp(0.8rem, 4vw, 1rem);
     padding: clamp(0.25rem, 2vw, 0.5rem);
@@ -218,18 +251,31 @@ const Input = styled.input`
 const AddButton = styled(Button)`
   padding: 0.5rem 1rem;
   flex-basis: fit-content;
+  box-shadow: none;
   @media (max-width: ${Device.sm}) {
     font-size: clamp(0.8rem, 4vw, 1rem);
     padding: clamp(0.25rem, 2vw, 0.5rem) 1rem;
   }
 `;
-const ItemsList = styled(ListSelector)``;
+const ItemsList = styled(ListSelector)`
+  height: 100%;
+  overflow-y: auto;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  border-top: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
+  border-bottom: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+`;
 
 const ListNameInput = styled.input`
   font-size: 1rem;
   padding: 0.5rem;
   margin: 1rem 0;
-  background: ${(props) => props.theme.colors.offWhite};
-  border: 2px solid ${(props) => props.theme.colors.secondary};
+  // background: HSLA$(${(props) => props.theme.colors.secondaryLight}, 1);
+  // border: 2px solid ${(props) => props.theme.colors.secondary};
   border-radius: 5px;
 `;
