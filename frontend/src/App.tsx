@@ -1,13 +1,13 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider, Route, createRoutesFromElements } from 'react-router-dom';
-import { ListLayout } from './pages/ListLayout';
-import { ListSelection } from './pages/ListSelection';
+import { PageLayout } from './pages/PageLayout';
 import { SelectedList } from './pages/SelectedList';
+import { MainView } from './pages/MainView';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<ListLayout />}>
-      <Route path="/" element={<ListSelection />} />
+    <Route element={<PageLayout />}>
+      <Route path="/" element={<MainView />} />
       <Route path="list">
         <Route path=":id" element={<SelectedList />} />
       </Route>
