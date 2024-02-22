@@ -33,8 +33,6 @@ async function getSingleList(req: Request, res: Response) {
       list_items
     WHERE 
       list_id = ${list_id}  
-    ORDER BY 
-      index
   `;
   try {
     const listData = await client.query(query);
@@ -74,13 +72,14 @@ async function deleteList(req: Request, res: Response) {
 
 async function addListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_item_id, list_item_value, completed } = req.body;
+  const { list_item_id, list_item_value, order_index, completed } = req.body;
   const list_id = req.params.list;
   try {
-    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4)', [
+    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, order_index, completed) VALUES ($1, $2, $3, $4, $5)', [
       list_id,
       list_item_id,
       list_item_value,
+      order_index,
       completed,
     ]);
     res.json({}).status(200);
