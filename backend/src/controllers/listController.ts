@@ -75,7 +75,7 @@ async function addListItem(req: Request, res: Response) {
   const { list_item_id, list_item_value, order_index, completed } = req.body;
   const list_id = req.params.list;
   try {
-    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $5)', [
+    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4)', [
       list_id,
       list_item_id,
       list_item_value,
