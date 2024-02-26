@@ -19,20 +19,24 @@ You can run the repo locally, but cannot connect to the database due to secret b
 
 To run the frontend navigate to the frontend folder, install dependencies, and run.
 
-`cd frontend
+```
+cd frontend
 
 npm install
 
-npm run dev`
+npm run dev
+```
 
 
 To run the backend navigate to the backend folder, install dependencies, and run.
 
-`cd backend
+```
+cd backend
 
 npm install
 
-npm run dev`
+npm run dev
+```
 
 ## Planned Features
 
