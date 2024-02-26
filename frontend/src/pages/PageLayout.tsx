@@ -62,15 +62,6 @@ const Header = styled.header`
   grid-column: left-start / right-end;
   align-items: center;
   justify-content: center;
-  padding-left: 2rem;
-  // background: linear-gradient(
-  //     deg,
-  //     HSLA(${(props) => props.theme.colors.primary}, 0.05) 20%,
-  //     HSLA(${(props) => props.theme.colors.secondary}, 0.1) 80%
-  //   ),
-  //   linear-gradient(330deg, HSLA(${(props) => props.theme.colors.primary}, 0.1) 50%, HSLA(${(props) => props.theme.colors.secondary}, 0.1) 50%),
-  //   linear-gradient(220deg, HSLA(${(props) => props.theme.colors.primary}, 0.1) 70%, HSLA(${(props) => props.theme.colors.secondary}, 0.1) 70%),
-  //   linear-gradient(270deg, HSLA(${(props) => props.theme.colors.primary}, 1), HSLA(${(props) => props.theme.colors.secondary}, 1));
   border-bottom: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
 `;
 
