@@ -1,7 +1,5 @@
 # Memopad Notes v.1.0
 
-## Description
-
 This is a web app for creating and managing multiple lists. It was created for my personal household use.
 It was originally designed to be used on mobile devices, but now supports all screen sizes.
 
