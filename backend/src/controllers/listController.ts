@@ -25,14 +25,17 @@ async function getSingleList(req: Request, res: Response) {
   const list_id = req.params.list;
 
   const query = `
-    SELECT 
+    SELECT
+    index, 
       list_item_id,
       list_item_value,
       completed
     FROM
       list_items
     WHERE 
-      list_id = ${list_id}  
+      list_id = ${list_id}
+    ORDER BY
+      index
   `;
   try {
     const listData = await client.query(query);
@@ -72,10 +75,11 @@ async function deleteList(req: Request, res: Response) {
 
 async function addListItem(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
-  const { list_item_id, list_item_value, completed } = req.body;
+  const { index, list_item_id, list_item_value, completed } = req.body;
   const list_id = req.params.list;
   try {
-    await client.query('INSERT INTO list_items (list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4)', [
+    await client.query('INSERT INTO list_items (index, list_id, list_item_id, list_item_value, completed) VALUES ($1, $2, $3, $4, $5)', [
+      index,
       list_id,
       list_item_id,
       list_item_value,
@@ -121,6 +125,7 @@ async function updateCompletionState(req: Request, res: Response) {
   const client = req.dbClient as PoolClient;
   const list_item_id = req.params.item;
   const completed = req.params.completion;
+  console.log('comp');
 
   try {
     await client.query('UPDATE list_items SET completed = ($2) WHERE list_item_id = ($1)', [list_item_id, completed]);
@@ -148,4 +153,58 @@ async function updateListName(req: Request, res: Response) {
   }
 }
 
-export { getAllLists, getSingleList, createNewList, deleteList, addListItem, deleteListItem, updateListItem, updateCompletionState, updateListName };
+async function updateItemIndex(req: Request, res: Response) {
+  const client = req.dbClient as PoolClient;
+  const { list_item_id, newIndex, oldIndex, list_id } = req.body;
+
+  const targetParams = [list_item_id, list_id, newIndex];
+  const allParams = [list_item_id, list_id, newIndex, oldIndex];
+
+  const targetIndexQuery = `
+  UPDATE list_items SET index = $3 
+    WHERE list_id = $2
+    AND list_item_id =  $1
+`;
+
+  const othersIndexQuery =
+    newIndex < oldIndex
+      ? `  
+    UPDATE list_items SET index = index + 1
+      WHERE list_id = $2
+      AND list_item_id != $1
+      AND index >= $3
+      AND index < $4`
+      : `
+  UPDATE list_items SET index = index - 1
+    WHERE list_id = $2
+    AND list_item_id != $1
+    AND index <= $3
+    AND index > $4
+`;
+
+  try {
+    await client.query('BEGIN');
+    await client.query(targetIndexQuery, targetParams);
+    await client.query(othersIndexQuery, allParams);
+    await client.query('COMMIT');
+    res.send({}).status(200);
+  } catch (err) {
+    await client.query('ROLLBACK;');
+    console.log(err);
+    res.send(JSON.stringify('Could not update item index.')).status(500);
+  } finally {
+    client.release();
+  }
+}
+export {
+  getAllLists,
+  getSingleList,
+  createNewList,
+  deleteList,
+  addListItem,
+  deleteListItem,
+  updateListItem,
+  updateCompletionState,
+  updateListName,
+  updateItemIndex,
+};

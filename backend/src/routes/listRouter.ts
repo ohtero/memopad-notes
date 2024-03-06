@@ -9,6 +9,7 @@ import {
   updateCompletionState,
   updateListItem,
   updateListName,
+  updateItemIndex,
 } from '../controllers/listController';
 
 const listRouter = express.Router();
@@ -21,6 +22,7 @@ listRouter.patch('/:list', updateListName);
 listRouter.post('/:list', addListItem);
 listRouter.delete('/:list/:item', deleteListItem);
 listRouter.patch('/:list/:item', updateListItem);
+listRouter.patch('/:list/:item/order', updateItemIndex);
 listRouter.patch('/:list/:item/:completion', updateCompletionState);
 
 export { listRouter };
