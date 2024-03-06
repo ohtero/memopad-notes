@@ -1,7 +1,6 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider, Route, createRoutesFromElements } from 'react-router-dom';
 import { PageLayout } from './pages/PageLayout';
-import { SelectedListItems } from './components/SelectedListItems';
 import { MainView } from './pages/MainView';
 import { ListContainer } from './pages/ListContainer';
 
