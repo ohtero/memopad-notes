@@ -1,6 +1,8 @@
+import styled from 'styled-components';
+
 import { useNavigate } from 'react-router-dom';
 import { modifyRequest as newListRequest } from '../utils/modifyRequest';
-import { MenuButton } from './UI/Button';
+import { Button } from './UI/Button';
 
 type AddNewListButtonProps = {
   handleClick: () => void;
@@ -27,5 +29,10 @@ export default function AddNewListButton({ handleClick }: AddNewListButtonProps)
     }
   }
 
-  return <MenuButton handleClick={() => void createNewList()}>Add List</MenuButton>;
+  return <AddButton onClick={() => void createNewList()}>Add List</AddButton>;
 }
+
+const AddButton = styled(Button)`
+  height: 100%;
+  padding: 0.5rem;
+`;
