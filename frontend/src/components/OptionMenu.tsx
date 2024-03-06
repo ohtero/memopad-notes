@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { MenuButton } from './UI/Button';
 import { useNavigate } from 'react-router-dom';
 import { modifyRequest as newListRequest } from '../utils/modifyRequest';
+import { Device } from '../assets/breakpoints';
 
 type ListId = {
   list_id: number;
@@ -38,10 +39,15 @@ export function OptionMenu() {
 }
 
 const Menu = styled.nav`
-  height: fit-content;
-  grid-row: list-footer-start / list-footer-end;
+  // height: fit-content;
+  grid-row: footer-start / footer-end;
   display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  width: 100%;
+  // gap: 0.5rem;
+  // padding: 0.5rem;
   // background: HSLA(${(props) => props.theme.colors.primary}, 1);
+  border-top: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
+  // @media (min-width: ${Device.sm}) {
+  //   display: none;
+  // }
 `;
