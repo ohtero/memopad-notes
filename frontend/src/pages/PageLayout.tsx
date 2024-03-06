@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { ListContainer } from '../components/ListContainer';
 import { Outlet } from 'react-router-dom';
 import { OptionMenu } from '../components/OptionMenu';
 import { Device } from '../assets/breakpoints';
@@ -18,21 +17,13 @@ export function PageLayout() {
             </Header>
             <Main>
               <ListSelection />
-              <ListWrapper>
-                <ListContainer>
-                  <Outlet />
-                </ListContainer>
-              </ListWrapper>
+              <Outlet />
             </Main>
           </DesktopView>
           <MobileView>
             <Main>
-              <ListWrapper>
-                <ListContainer>
-                  <Outlet />
-                </ListContainer>
-                <OptionMenu />
-              </ListWrapper>
+              <Outlet />
+              <OptionMenu />
             </Main>
           </MobileView>
         </PageContainer>
@@ -46,13 +37,29 @@ const PageContainer = styled.div`
   height: 100svh;
   display: grid;
   grid-template-rows: [header-start] auto [header-end main-start] auto [main-end];
-  grid-template-columns: [left-start] 1fr [left-end mid-start] 40% [mid-end right-start] 1fr [right-end];
-  column-gap: clamp(1rem, 3vw, 4rem);
+  grid-template-columns: [left-start] 1fr [left-end mid-start] 2fr [mid-end right-start] 1fr [right-end];
   row-gap: 2rem;
 
   @media (max-width: ${Device.sm}) {
     grid-template-rows: [main-start] auto [main-end];
     grid-template-columns: [left-start] auto [right-end];
+  }
+`;
+
+const Main = styled.main`
+  display: grid;
+  justify-items: center;
+  height: 80svh;
+  grid-row: main-start / main-end;
+  grid-column: left-start / right-end;
+  grid-template-rows: [main-start] auto [main-end];
+  grid-template-columns: subgrid;
+  margin: 0 2rem;
+  @media (max-width: ${Device.sm}) {
+    grid-template-rows: [main-start] 1fr [main-end footer-start] auto [footer-end];
+    align-content: space-between;
+    margin: 0;
+    height: 100svh;
   }
 `;
 
@@ -62,7 +69,6 @@ const Header = styled.header`
   grid-column: left-start / right-end;
   align-items: center;
   justify-content: center;
-  border-bottom: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
 `;
 
 const Heading = styled.h1`
@@ -71,33 +77,4 @@ const Heading = styled.h1`
   color: HSLA(${(props) => props.theme.colors.primaryDark}, 1);
   border-left: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
   border-right: 3px solid HSLA(${(props) => props.theme.colors.primaryDark}, 0.5);
-`;
-
-const Main = styled.main`
-  display: grid;
-  grid-row: main-start / main-end;
-  grid-column: left-start / right-end;
-  grid-template-rows: [main-start] auto [main-end];
-  grid-template-columns: subgrid;
-  // height: 100%;
-  margin: 0 2rem;
-  @media (max-width: ${Device.sm}) {
-    margin: 0;
-  }
-`;
-
-const ListWrapper = styled.div`
-  display: grid;
-  grid-row: main-start / main-end;
-  grid-column: mid-start / mid-end;
-  grid-template-rows: [list-start] 1fr [list-end];
-  width: 100%;
-  height: 80svh;
-  align-content: space-between;
-
-  @media (max-width: ${Device.sm}) {
-    grid-template-rows: [list-start] 1fr [list-end list-footer-start] auto [list-footer-end];
-    height: 100vh;
-    height: 100svh;
-  }
 `;

@@ -1,19 +1,26 @@
-import { useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { DeleteIcon, EditIcon } from '../assets/Icons';
 import { modifyRequest } from '../utils/modifyRequest';
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { DraggableAttributes, UniqueIdentifier } from '@dnd-kit/core';
+import { Device } from '../assets/breakpoints';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 type ListItemProps = {
-  listId: string;
+  listId: number;
   itemId: string;
   value: string;
   completed: boolean;
   handleClick: () => void;
+  style?: object;
+  listeners?: SyntheticListenerMap | undefined;
+  attributes?: DraggableAttributes;
+  activeId?: UniqueIdentifier | null;
 };
 
-export function Item({ listId, itemId, value, completed, handleClick }: ListItemProps) {
+const Item = forwardRef<HTMLLIElement, ListItemProps>(({ listId, itemId, value, completed, handleClick, activeId, style, ...props }, ref) => {
   const [itemValue, setItemValue] = useState<string>(value);
   const [initItemValue, setInitItemValue] = useState<string>('');
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
@@ -52,8 +59,8 @@ export function Item({ listId, itemId, value, completed, handleClick }: ListItem
   }
 
   return (
-    <ItemContainer $completed={isCompleted}>
-      <TextContainer>
+    <ItemContainer ref={ref} style={style} $completed={isCompleted} $active={activeId} $itemId={itemId}>
+      <TextContainer {...props}>
         <Overlay
           disabled={isDisabled}
           onDoubleClick={() => {
@@ -85,26 +92,31 @@ export function Item({ listId, itemId, value, completed, handleClick }: ListItem
             !isDisabled && !isCompleted && inputRef.current?.focus();
           }}
         >
-          <EditIcon $dark height={'1.5rem'} />
+          <EditIcon $dark height={'1.6rem'} />
         </EditButton>
         <DeleteButton onClick={handleClick}>
-          <DeleteIcon $dark height={'1.75rem'} />
+          <DeleteIcon $dark height={'2rem'} />
         </DeleteButton>
       </ButtonContainer>
     </ItemContainer>
   );
-}
+});
 
-const ItemContainer = styled.div<{ $completed?: boolean }>`
+Item.displayName = 'Item';
+
+export default Item;
+
+const ItemContainer = styled.li<{ $completed?: boolean; $active?: UniqueIdentifier | null; $itemId: string }>`
+  opacity: ${(props) => (props.$active === props.$itemId ? '0' : props.$completed ? '0.5' : 1)};
   display: flex;
+  width: 35vw;
   gap: 0.5rem;
-  margin: 0 0.5rem;
-  align-items: center;
   border-radius: 3px;
   background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
-  opacity: ${(props) => props.$completed && '50%'};
-  backdrop-filter: blur(5px);
-  border: 3px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
+  border: 2px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
+  @media (max-width: ${Device.sm}) {
+    width: calc(98vw - 1rem);
+  }
 `;
 
 const TextContainer = styled.div`
@@ -143,8 +155,7 @@ const ItemText = styled.input<{ disabled: boolean }>`
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 0.5rem;
-  padding-right: 0.5rem;
+
   align-items: center;
 `;
 
@@ -152,12 +163,15 @@ const EditButton = styled.button`
   display: flex;
   background: inherit;
   border: none;
-  padding: 0;
+  padding: 0 0.5rem;
+  border-right: 1px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
+  border-left: 1px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
 `;
 
 const DeleteButton = styled.button`
   display: flex;
   background: inherit;
   border: none;
-  padding: 0;
+  padding-left: 0.4rem;
+  padding-right: 0.5rem;
 `;

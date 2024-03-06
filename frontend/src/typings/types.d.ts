@@ -6,6 +6,7 @@ export interface ListData {
 export interface ListItem {
   list_item_id: string;
   list_item_value: string;
+  index: number;
   completed: boolean;
 }
 

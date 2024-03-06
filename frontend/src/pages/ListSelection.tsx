@@ -68,7 +68,7 @@ export function ListSelection() {
             {list_name}
           </ListSelectorButton>
           <ListDeleteButton onClick={() => handleDelClick(list_name, list_id)}>
-            <DeleteIcon $dark height={'2rem'} />
+            <DeleteIcon $dark height={'2.25rem'} />
           </ListDeleteButton>
         </ListItem>
       );
@@ -127,13 +127,13 @@ export function ListSelection() {
 const ComponentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: clamp(18rem, 20vw, 30rem);
   height: 80vh;
   height: 80svh;
-  backdrop-filter: blur(7px);
-  background: HSLA(${(props) => props.theme.colors.primary}, 0.25);
-  box-shadow: ${(props) => props.theme.shadows.bottomSmall};
-  padding: 1rem;
+  min-width: calc(19vw + 1rem);
+  backdrop-filter: blur(5px);
+  width: fit-content;
+  background: HSLA(${(props) => props.theme.colors.primary}, 0.2);
+  padding-bottom: 1rem;
   overflow: hidden;
   @media (max-width: ${Device.sm}) {
     background: none;
@@ -145,8 +145,10 @@ const ComponentWrapper = styled.div`
 `;
 
 const TopWrapper = styled.div`
-  padding: 0 0.5rem;
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  height: 3.75rem;
   @media (max-width: ${Device.sm}) {
     padding: 1.025rem;
     margin: 0;
@@ -160,14 +162,17 @@ const Header = styled.h3`
 export const ListSelector = styled.ul`
   display: flex;
   flex-direction: column;
+  align-items: center;
   height: 100%;
-  padding: 0.5rem;
-  // margin-top: 0.5rem;
-  gap: 0.75rem;
-  border-top: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
-  border-bottom: 2px solid HSLA(${(props) => props.theme.colors.primary}, 1);
+  width: 100%;
+  padding: 1rem;
+  padding-top: 0.75rem;
+  gap: 0.5rem;
+  border-top: 2px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
+  border-bottom: 2px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
   list-style: none;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   &::-webkit-scrollbar {
     width: 12px;
@@ -177,14 +182,22 @@ const ListItem = styled.li<{ $pending: boolean; target: number | null; id: numbe
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 18vw;
+  max-width: 25rem;
   flex-grow: 0;
   border-radius: 3px;
   font-size: 1rem;
+  padding: 0.5rem;
   opacity: ${(props) => (props.$pending && props.id === props.target ? '50%' : '100%')};
   background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
-  border: 3px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
+  border: 2px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
   &:hover {
     background: HSLA(${(props) => props.theme.colors.highlight}, 1);
+  }
+
+  @media (max-width: ${Device.sm}) {
+    width: calc(98vw - 1rem);
+    max-width: none;
   }
 `;
 
@@ -192,7 +205,6 @@ const ListSelectorButton = styled.button`
   display: flex;
   width: 100%;
   height: 100%;
-  padding: 0.7rem;
   border: 0;
   border-radius: 5px 0 0 5px;
   font-size: 1rem;
@@ -205,7 +217,9 @@ const ListSelectorButton = styled.button`
 
 const ListDeleteButton = styled(ListSelectorButton)`
   width: fit-content;
-  border-radius: 0 5px 5px 0;
+  border-radius: 0;
+  padding-left: 0.5rem;
+  border-left: 1px solid HSLA(${(props) => props.theme.colors.primary}, 0.5);
   &:hover {
     cursor: pointer;
   }

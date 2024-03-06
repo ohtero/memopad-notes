@@ -9,6 +9,9 @@ export default function GuidePrompt({ text }: PromptTypes) {
 }
 
 const Text = styled.p`
+  grid-row: main-start / main-end;
+  grid-column: mid-start / mid-end;
+  // width: 40vw;
   place-self: center;
   text-align: center;
   font-size: 1.5rem;
