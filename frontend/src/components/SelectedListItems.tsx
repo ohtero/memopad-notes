@@ -10,6 +10,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   UniqueIdentifier,
   closestCenter,
   useSensor,
@@ -34,7 +35,19 @@ export function SelectedListItems(props: SelectedListItemsProps) {
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const mouseSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 100,
+      tolerance: 25,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 25,
+    },
+  });
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -65,7 +78,7 @@ export function SelectedListItems(props: SelectedListItemsProps) {
                 ))}
             </ItemsList>
           </SortableContext>
-          <DragOverlay wrapperElement="ul" className="overlay" style={{ zIndex: '1' }}>
+          <DragOverlay wrapperElement="ul" className="overlay" style={{ zIndex: '1', padding: '0', boxShadow: '0px 0px 5px 2px #456' }}>
             {activeId
               ? isListValueArray(listItems) &&
                 listItems.map(
