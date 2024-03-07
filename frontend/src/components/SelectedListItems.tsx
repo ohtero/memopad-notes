@@ -24,12 +24,13 @@ type SelectedListItemsProps = {
   listId: number | undefined;
   handleItemDelete: (itemId: string) => void;
   updateListItems: (listItems: ListItem[]) => void;
+  updateItemValue?: (itemId: string, newValue: string) => void;
   isPending: boolean;
   error: string | null;
 };
 
 export function SelectedListItems(props: SelectedListItemsProps) {
-  const { listItems, listId, handleItemDelete, isPending, error, updateListItems } = props;
+  const { listItems, listId, handleItemDelete, isPending, error, updateListItems, updateItemValue } = props;
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -58,6 +59,7 @@ export function SelectedListItems(props: SelectedListItemsProps) {
                     value={item.list_item_value}
                     completed={item.completed}
                     handleClick={() => handleItemDelete(item.list_item_id)}
+                    updateItemValue={updateItemValue}
                     activeId={activeId}
                   />
                 ))}

@@ -22,6 +22,7 @@ export function ListContainer() {
   const { data, isPending, error, reFetch } = useFetch({ method: 'GET', operation: 'getSingleList', listId: toInt(id) });
 
   useEffect(() => {
+    setListItems([]);
     reFetch({ method: 'GET', operation: 'getSingleList', listId: toInt(id) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -44,6 +45,16 @@ export function ListContainer() {
     setListItems(orderedItems);
   }
 
+  function updateListItemValue(itemId: string, newValue: string) {
+    const updatedItems = listItems.map((item) => {
+      if (item.list_item_id === itemId) {
+        return { ...item, list_item_value: newValue };
+      }
+      return item;
+    });
+    setListItems(updatedItems);
+  }
+
   return (
     <>
       <SelectedListItemsContainer>
@@ -61,6 +72,7 @@ export function ListContainer() {
               listId={listId}
               handleItemDelete={deleteListItem}
               updateListItems={updateListItemOrder}
+              updateItemValue={updateListItemValue}
               isPending={isPending}
               error={error}
             />
