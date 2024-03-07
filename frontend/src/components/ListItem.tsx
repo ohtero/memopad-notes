@@ -14,93 +14,97 @@ type ListItemProps = {
   value: string;
   completed: boolean;
   handleClick: () => void;
+  updateItemValue?: (itemId: string, newValue: string) => void;
   style?: object;
   listeners?: SyntheticListenerMap | undefined;
   attributes?: DraggableAttributes;
   activeId?: UniqueIdentifier | null;
 };
 
-const Item = forwardRef<HTMLLIElement, ListItemProps>(({ listId, itemId, value, completed, handleClick, activeId, style, ...props }, ref) => {
-  const [itemValue, setItemValue] = useState<string>(value);
-  const [initItemValue, setInitItemValue] = useState<string>('');
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
-  const [isCompleted, setIsCompleted] = useState<boolean>(completed);
+const Item = forwardRef<HTMLLIElement, ListItemProps>(
+  ({ listId, itemId, value, completed, handleClick, updateItemValue, activeId, style, ...props }, ref) => {
+    const [itemValue, setItemValue] = useState<string>(value);
+    const [initItemValue, setInitItemValue] = useState<string>('');
+    const [isDisabled, setIsDisabled] = useState<boolean>(true);
+    const [isCompleted, setIsCompleted] = useState<boolean>(completed);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  async function updateItem() {
-    const options = {
-      method: 'PATCH',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ list_item_value: itemValue }),
-    };
-    if (initItemValue !== itemValue) {
-      const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}`, options);
-      if (!res.success) {
-        console.error('Could not update list item', res.error);
+    async function updateItem() {
+      const options = {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ list_item_value: itemValue }),
+      };
+      if (initItemValue !== itemValue) {
+        const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}`, options);
+        if (!res.success) {
+          console.error('Could not update list item', res.error);
+        }
+        setInitItemValue('');
+        updateItemValue && updateItemValue(itemId, itemValue);
       }
-      setInitItemValue('');
     }
-  }
 
-  async function syncCompletionState() {
-    const options = {
-      method: 'PATCH',
-      headers: {
-        'content-type': 'application/json',
-      },
-    };
-    const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}/${!isCompleted}`, options);
-    if (!res.success) {
-      console.error('Could not update completion state: ', res.error);
+    async function syncCompletionState() {
+      const options = {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+        },
+      };
+      const res = await modifyRequest(apiUrl + `/lists/${listId}/${itemId}/${!isCompleted}`, options);
+      if (!res.success) {
+        console.error('Could not update completion state: ', res.error);
+      }
     }
-  }
 
-  return (
-    <ItemContainer ref={ref} style={style} $completed={isCompleted} $active={activeId} $itemId={itemId}>
-      <TextContainer {...props}>
-        <Overlay
-          disabled={isDisabled}
-          onDoubleClick={() => {
-            setIsCompleted((prevState) => !prevState);
-            void syncCompletionState();
-            inputRef.current?.blur();
-          }}
-        />
-        <ItemText
-          ref={inputRef}
-          value={itemValue}
-          disabled={isDisabled}
-          onChange={(e) => setItemValue(e.target.value)}
-          onFocus={(e) => {
-            setInitItemValue(e.target.value);
-            inputRef.current?.setSelectionRange(-1, -1);
-          }}
-          onBlur={() => {
-            void updateItem();
-            setIsDisabled(true);
-          }}
-          onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.blur()}
-        />
-      </TextContainer>
-      <ButtonContainer>
-        <EditButton
-          onMouseDown={() => !isCompleted && setIsDisabled((prevState) => !prevState)}
-          onMouseUp={() => {
-            !isDisabled && !isCompleted && inputRef.current?.focus();
-          }}
-        >
-          <EditIcon $dark height={'1.6rem'} />
-        </EditButton>
-        <DeleteButton onClick={handleClick}>
-          <DeleteIcon $dark height={'2rem'} />
-        </DeleteButton>
-      </ButtonContainer>
-    </ItemContainer>
-  );
-});
+    return (
+      <ItemContainer ref={ref} style={style} $completed={isCompleted} $active={activeId} $itemId={itemId}>
+        <TextContainer {...props}>
+          <Overlay
+            disabled={isDisabled}
+            onDoubleClick={() => {
+              setIsCompleted((prevState) => !prevState);
+              void syncCompletionState();
+              inputRef.current?.blur();
+            }}
+          />
+          <ItemText
+            ref={inputRef}
+            value={itemValue}
+            disabled={isDisabled}
+            onChange={(e) => setItemValue(e.target.value)}
+            onFocus={(e) => {
+              setInitItemValue(e.target.value);
+              inputRef.current?.setSelectionRange(-1, -1);
+            }}
+            onBlur={() => {
+              void updateItem();
+              setIsDisabled(true);
+            }}
+            onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.blur()}
+          />
+        </TextContainer>
+        <ButtonContainer>
+          <EditButton
+            onMouseDown={() => !isCompleted && setIsDisabled((prevState) => !prevState)}
+            onMouseUp={() => {
+              !isDisabled && !isCompleted && inputRef.current?.focus();
+            }}
+          >
+            <EditIcon $dark height={'1.6rem'} />
+          </EditButton>
+          <DeleteButton onClick={handleClick}>
+            <DeleteIcon $dark height={'2rem'} />
+          </DeleteButton>
+        </ButtonContainer>
+      </ItemContainer>
+    );
+  }
+);
 
 Item.displayName = 'Item';
 

@@ -9,10 +9,11 @@ type ListItemsProps = {
   value: string;
   completed: boolean;
   handleClick: () => void;
+  updateItemValue?: (itemId: string, newValue: string) => void;
   activeId: UniqueIdentifier | null;
 };
 
-export function SortableListItem({ listId, itemId, value, completed, handleClick, activeId }: ListItemsProps) {
+export function SortableListItem({ listId, itemId, value, completed, handleClick, updateItemValue, activeId }: ListItemsProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: itemId });
 
   const style = {
@@ -31,6 +32,7 @@ export function SortableListItem({ listId, itemId, value, completed, handleClick
       value={value}
       completed={completed}
       handleClick={handleClick}
+      updateItemValue={updateItemValue}
       activeId={activeId}
     />
   );
