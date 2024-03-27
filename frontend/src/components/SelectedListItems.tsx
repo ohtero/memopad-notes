@@ -37,13 +37,13 @@ export function SelectedListItems(props: SelectedListItemsProps) {
 
   const mouseSensor = useSensor(PointerSensor, {
     activationConstraint: {
-      delay: 100,
+      delay: 500,
       tolerance: 25,
     },
   });
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 250,
+      delay: 500,
       tolerance: 25,
     },
   });
