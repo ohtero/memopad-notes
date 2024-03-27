@@ -9,6 +9,7 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  MouseSensor,
   PointerSensor,
   TouchSensor,
   UniqueIdentifier,
@@ -41,13 +42,13 @@ export function SelectedListItems(props: SelectedListItemsProps) {
       tolerance: 25,
     },
   });
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 500,
-      tolerance: 25,
-    },
-  });
-  const sensors = useSensors(mouseSensor, touchSensor);
+  // const touchSensor = useSensor(TouchSensor, {
+  //   activationConstraint: {
+  //     delay: 500,
+  //     tolerance: 25,
+  //   },
+  // });
+  const sensors = useSensors(mouseSensor);
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
