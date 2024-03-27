@@ -118,7 +118,6 @@ const ItemContainer = styled.li<{ $completed?: boolean; $active?: UniqueIdentifi
   border-radius: 3px;
   background: HSLA(${(props) => props.theme.colors.secondaryLight}, 1);
   border: 2px solid HSLA(${(props) => props.theme.colors.primary}, 0.25);
-  touch-action: none;
   @media (max-width: ${Device.sm}) {
     width: calc(98vw - 1rem);
 `;
